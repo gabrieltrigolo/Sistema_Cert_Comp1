@@ -14,5 +14,5 @@
 | RF12 | O sistema deve gerar relatórios sobre estoque atual (quantidade por tipo de produto) | 2 |
 | RF13 | O sistema deve exibir um painel de indicadores com total de itens em estoque | 2 |
 | RF14 | O sistema deve exibir um painel de indicadores com quantidade de beneficiárias atendidas no mês | 2 |
-| RF15 | O sistema deve gerar relatórios sobre distribuições realizadas por períodos ou por beneficiária | 2 |
-| RF16 | O sistema deve exibir um painel de indicadores com quantidade de doações recebidas no mês | 2 |
+| RF15 | O sistema deve gerar relatórios sobre distribuições realizadas por períodos ou por beneficiária | 3 |
+| RF16 | O sistema deve exibir um painel de indicadores com quantidade de doações recebidas no mês | 3 |
