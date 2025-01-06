@@ -2,10 +2,10 @@
 
 ## Documento Inicial
 
-<li><a  href="Documentos e Informações/22_11_2024 - Grupo 4 - Projeto Inicial.pdf">Projeto Inicial</a></li>
+- [Projeto Inicial](https://github.com/gabrieltrigolo/Sistema_Cert_Comp1/blob/main/Documentos%20e%20Informa%C3%A7%C3%B5es/22_11_2024%20-%20Grupo%204%20-%20Projeto%20Inicial.pdf)
 
 ## Diagrama de Classes
 
 - [draw.io](https://app.diagrams.net/)
-  <li><a  href="Documentos e Informações/DiagramaClassesCertificadora.drawio">Arquivo para download</a></li>
+- [Arquivo para download](https://github.com/gabrieltrigolo/Sistema_Cert_Comp1/blob/main/Documentos%20e%20Informa%C3%A7%C3%B5es/DiagramaClassesCertificadora.drawio)
   
