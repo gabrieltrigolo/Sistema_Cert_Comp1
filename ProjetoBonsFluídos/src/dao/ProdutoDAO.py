@@ -48,3 +48,31 @@ class ProdutoDAO:
                 conn.close()
         except Error as e:
             print(f"Erro ao inserir produto: {e}")
+
+    def atualizar(self, produto):
+        sql = """
+        UPDATE produto
+        SET nome = %s, categoria = %s, quantidade = %s, validade = %s, lote = %s
+        WHERE produto_id = %s
+        """
+        try:
+            conn = self.get_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute(sql, (
+                    produto.nome,
+                    produto.categoria,
+                    produto.quantidade,
+                    produto.validade,
+                    produto.lote,
+                    produto.idProduto
+                ))
+                conn.commit()
+                if cursor.rowcount > 0:
+                    print("Produto atualizado com sucesso!")
+                else:
+                    print("Produto não encontrado ou não houve alterações.")
+                cursor.close()
+                conn.close()
+        except Error as e:
+            print(f"Erro ao atualizar produto: {e}")
