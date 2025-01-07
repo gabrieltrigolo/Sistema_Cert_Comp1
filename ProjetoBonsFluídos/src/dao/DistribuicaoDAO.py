@@ -12,6 +12,18 @@ class DistribuicaoDAO:
         """
         self.db_config = db_config
 
+    def get_connection(self):
+        """
+        Obtém a conexão com o banco de dados.
+        """
+        try:
+            connection = mysql.connector.connect(**self.db_config)
+            if connection.is_connected():
+                return connection
+        except Error as e:
+            print(f"Erro ao conectar ao MySQL: {e}")
+            return None
+
     def inserir(self, distribuicao):
         """
         Insere uma nova distribuição no banco de dados.
@@ -38,7 +50,7 @@ class DistribuicaoDAO:
 
         try:
             # Conectar ao banco de dados
-            connection = mysql.connector.connect(**self.db_config)
+            connection = self.get_connection()
             cursor = connection.cursor()
 
             # Desabilitar commit automático
@@ -87,3 +99,47 @@ class DistribuicaoDAO:
                 cursor.close()
             if connection:
                 connection.close()
+
+    def atualizar(self, distribuicao):
+        """
+        Atualiza uma distribuição no banco de dados.
+        :param distribuicao: Objeto da classe Distribuicao a ser atualizado.
+        """
+        sql_distribuicao = """
+        UPDATE distribuicao
+        SET beneficiario_id = %s, data_distribuicao = %s
+        WHERE distribuicao_id = %s
+        """
+        sql_produtos_distribuicao = """
+        UPDATE distribuicao_produtos
+        SET quantidade = %s
+        WHERE distribuicao_id = %s AND produto_id = %s
+        """
+        try:
+            conn = self.get_connection()
+            if conn:
+                cursor = conn.cursor()
+
+                # Atualizar a distribuição
+                cursor.execute(sql_distribuicao, (
+                    distribuicao.beneficiario.id,
+                    distribuicao.data_distribuicao,  # corrigido para o nome correto
+                    distribuicao.idDistribuicao
+                ))
+
+                # Atualizar os produtos na distribuição
+                for produto in distribuicao.produtos:
+                    cursor.execute(sql_produtos_distribuicao, (
+                        produto.quantidade,
+                        distribuicao.idDistribuicao,
+                        produto.id
+                    ))
+
+                conn.commit()
+                print("Distribuição atualizada com sucesso!")
+
+                cursor.close()
+                conn.close()
+
+        except Error as e:
+            print(f"Erro ao atualizar distribuição: {e}")
