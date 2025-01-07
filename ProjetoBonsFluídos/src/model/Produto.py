@@ -1,20 +1,20 @@
 class Produto:
-    def __init__(self, produto_id=None, nome=None, preco_unitario=0.0, quantidade=0, categoria=None, preco_custo=0.0):
+    def __init__(self, idProduto=None, nome=None, categoria=None, quantidade=0, validade=None, lote=None):
         
-        self._produto_id = produto_id
+        self._idProduto = idProduto
         self._nome = nome
-        self._preco_unitario = preco_unitario
-        self._quantidade = quantidade
         self._categoria = categoria
-        self._preco_custo = preco_custo
+        self._quantidade = quantidade
+        self._validade = validade
+        self._lote = lote
 
     @property
-    def produto_id(self):
-        return self._produto_id
+    def idProduto(self):
+        return self._idProduto
 
-    @produto_id.setter
-    def produto_id(self, value):
-        self._produto_id = value
+    @idProduto.setter
+    def idProduto(self, value):
+        self._idProduto = value
 
     @property
     def nome(self):
@@ -25,12 +25,12 @@ class Produto:
         self._nome = value
 
     @property
-    def preco_unitario(self):
-        return self._preco_unitario
+    def categoria(self):
+        return self._categoria
 
-    @preco_unitario.setter
-    def preco_unitario(self, value):
-        self._preco_unitario = value
+    @categoria.setter
+    def categoria(self, value):
+        self._categoria = value
 
     @property
     def quantidade(self):
@@ -41,32 +41,31 @@ class Produto:
         self._quantidade = value
 
     @property
-    def categoria(self):
-        return self._categoria
+    def validade(self):
+        return self._validade
 
-    @categoria.setter
-    def categoria(self, value):
-        self._categoria = value
+    @validade.setter
+    def validade(self, value):
+        self._validade = value
 
     @property
-    def preco_custo(self):
-        return self._preco_custo
+    def lote(self):
+        return self._lote
 
-    @preco_custo.setter
-    def preco_custo(self, value):
-        self._preco_custo = value
+    @lote.setter
+    def lote(self, value):
+        self._lote = value
 
     def __eq__(self, other):
         if isinstance(other, Produto):
-            return self.produto_id == other.produto_id
+            return self.idProduto == other.idProduto
         return False
 
     def __hash__(self):
-        return hash(self.produto_id)
+        return hash(self.idProduto)
 
     def __repr__(self):
         return (
-            f"Produto(produto_id={self.produto_id}, nome='{self.nome}', "
-            f"preco_unitario={self.preco_unitario:.2f}, quantidade={self.quantidade}, "
-            f"categoria='{self.categoria}', preco_custo={self.preco_custo:.2f})"
+            f"Produto(idProduto={self.idProduto}, nome='{self.nome}', categoria='{self.categoria}', "
+            f"quantidade={self.quantidade}, validade='{self.validade}', lote='{self.lote}')"
         )
