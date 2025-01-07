@@ -45,3 +45,28 @@ class BeneficiarioDAO:
                 conn.close()
         except Error as e:
             print(f"Erro ao inserir Beneficiario: {e}")
+
+    def atualizar(self, beneficiario):
+        sql = """
+        UPDATE beneficiario
+        SET nome = %s, email = %s
+        WHERE beneficiario_id = %s
+        """
+        try:
+            conn = self.get_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute(sql, (
+                    beneficiario.nome,
+                    beneficiario.email,
+                    beneficiario.idBeneficiario
+                ))
+                conn.commit()
+                if cursor.rowcount > 0:
+                    print("Beneficiário atualizado com sucesso!")
+                else:
+                    print("Beneficiário não encontrado ou não houve alterações.")
+                cursor.close()
+                conn.close()
+        except Error as e:
+            print(f"Erro ao atualizar beneficiário: {e}")
