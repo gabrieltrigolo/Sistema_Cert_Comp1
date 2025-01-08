@@ -1,12 +1,11 @@
 class Produto:
-    def __init__(self, idProduto=None, nome=None, categoria=None, quantidade=0, validade=None, lote=None):
+    def __init__(self, idProduto=None, nome=None, descricao=None, quantidade=0, dataRecebimento=None):
         
         self._idProduto = idProduto
         self._nome = nome
-        self._categoria = categoria
+        self._descricao = descricao
         self._quantidade = quantidade
-        self._validade = validade
-        self._lote = lote
+        self._dataRecebimento = dataRecebimento
 
     @property
     def idProduto(self):
@@ -25,12 +24,12 @@ class Produto:
         self._nome = value
 
     @property
-    def categoria(self):
-        return self._categoria
+    def descricao(self):
+        return self._descricao
 
-    @categoria.setter
-    def categoria(self, value):
-        self._categoria = value
+    @descricao.setter
+    def descricao(self, value):
+        self._descricao = value
 
     @property
     def quantidade(self):
@@ -41,20 +40,12 @@ class Produto:
         self._quantidade = value
 
     @property
-    def validade(self):
-        return self._validade
+    def dataRecebimento(self):
+        return self._dataRecebimento
 
-    @validade.setter
-    def validade(self, value):
-        self._validade = value
-
-    @property
-    def lote(self):
-        return self._lote
-
-    @lote.setter
-    def lote(self, value):
-        self._lote = value
+    @dataRecebimento.setter
+    def dataRecebimento(self, value):
+        self._dataRecebimento = value
 
     def __eq__(self, other):
         if isinstance(other, Produto):
@@ -66,6 +57,6 @@ class Produto:
 
     def __repr__(self):
         return (
-            f"Produto(idProduto={self.idProduto}, nome='{self.nome}', categoria='{self.categoria}', "
-            f"quantidade={self.quantidade}, validade='{self.validade}', lote='{self.lote}')"
+            f"Produto(idProduto={self.idProduto}, nome='{self.nome}', descricao='{self.descricao}', "
+            f"quantidade={self.quantidade}, dataRecebimento='{self.dataRecebimento}')"
         )
