@@ -1,72 +1,126 @@
-import mysql.connector
-from mysql.connector import Error
-from model.Beneficiario import Beneficiario
+from ..dao.ConnectionFactory import ConnectionFactory
+from ..model.Beneficiario import Beneficiario
 
 class BeneficiarioDAO:
-    def __init__(self, host, database, user, password):
-        self.host = host
-        self.database = database
-        self.user = user
-        self.password = password
-
-    def get_connection(self):
-        try:
-            connection = mysql.connector.connect(
-                host=self.host,
-                database=self.database,
-                user=self.user,
-                password=self.password
-            )
-            if connection.is_connected():
-                return connection
-        except Error as e:
-            print(f"Erro ao conectar ao MySQL: {e}")
-            return None
 
     def inserir(self, beneficiario):
-        sql = """
-        INSERT INTO beneficiario (nome, email)
-        VALUES (%s, %s)
+        sql_check = """
+        SELECT 1 FROM beneficiario WHERE cnpj_cpf = %s
+        """
+        sql_insert = """
+        INSERT INTO beneficiario (nome, email, cnpj_cpf)
+        VALUES (%s, %s, %s)
         """
         try:
-            conn = self.get_connection()
+            conn = ConnectionFactory.get_connection()
             if conn:
                 cursor = conn.cursor()
-                cursor.execute(sql, (
-                    beneficiario.nome,
-                    beneficiario.email,
-                ))
-                conn.commit()
-                if cursor.rowcount > 0:
-                    print("Beneficiario cadastrado com sucesso!")
+
+                # Verifica se o cnpj_cpf já existe
+                cursor.execute(sql_check, (beneficiario.identificador,))
+                result = cursor.fetchone()
+
+                if result:
+                    print("Beneficiário com este CNPJ/CPF já está cadastrado.")
                 else:
-                    print("Beneficiario não cadastrado.")
+                    # Insere o novo beneficiário
+                    cursor.execute(sql_insert, (
+                        beneficiario.nome,
+                        beneficiario.email,
+                        beneficiario.identificador
+                    ))
+                    conn.commit()
+                    if cursor.rowcount > 0:
+                        print("Beneficiário cadastrado com sucesso!")
+                    else:
+                        print("Beneficiário não cadastrado.")
+
                 cursor.close()
                 conn.close()
-        except Error as e:
-            print(f"Erro ao inserir Beneficiario: {e}")
+        except Exception as e:
+            print(f"Erro ao inserir Beneficiário: {e}")
 
     def atualizar(self, beneficiario):
-        sql = """
+        sql_update = """
         UPDATE beneficiario
         SET nome = %s, email = %s
-        WHERE beneficiario_id = %s
+        WHERE cnpj_cpf = %s
         """
         try:
-            conn = self.get_connection()
+            conn = ConnectionFactory.get_connection()
             if conn:
                 cursor = conn.cursor()
-                cursor.execute(sql, (
+                cursor.execute(sql_update, (
                     beneficiario.nome,
                     beneficiario.email,
-                    beneficiario.idBeneficiario
+                    beneficiario.identificador
                 ))
                 conn.commit()
                 if cursor.rowcount > 0:
                     print("Beneficiário atualizado com sucesso!")
                 else:
-                    print("Beneficiário não encontrado ou não houve alterações.")
+                    print("Beneficiário não encontrado.")
+
                 cursor.close()
                 conn.close()
-        except Error as e:
-            print(f"Erro ao atualizar beneficiário: {e}")
+        except Exception as e:
+            print(f"Erro ao atualizar Beneficiário: {e}")
+
+    def buscarPorId(self, cnpj_cpf):
+        sql_select = """
+        SELECT * FROM beneficiario WHERE cnpj_cpf = %s
+        """
+        try:
+            conn = ConnectionFactory.get_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute(sql_select, (cnpj_cpf,))
+                result = cursor.fetchone()
+                cursor.close()
+                conn.close()
+                if result:
+                    return Beneficiario(*result)
+                else:
+                    print("Beneficiário não encontrado.")
+                    return None
+        except Exception as e:
+            print(f"Erro ao buscar Beneficiário: {e}")
+            return None
+
+    def listarTodosBeneficiarios(self):
+        sql_select_all = """
+        SELECT beneficiario_id, nome, email, cnpj_cpf FROM beneficiario
+        """
+        try:
+            conn = ConnectionFactory.get_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute(sql_select_all)
+                results = cursor.fetchall()
+                cursor.close()
+                conn.close()
+                beneficiarios = [Beneficiario(*row) for row in results]
+                return beneficiarios
+        except Exception as e:
+            print(f"Erro ao listar Beneficiários: {e}")
+            return []
+
+    def deletarBeneficiario(self, cnpj_cpf):
+        sql_delete = """
+        DELETE FROM beneficiario WHERE cnpj_cpf = %s
+        """
+        try:
+            conn = ConnectionFactory.get_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute(sql_delete, (cnpj_cpf,))
+                conn.commit()
+                if cursor.rowcount > 0:
+                    print("Beneficiário deletado com sucesso!")
+                else:
+                    print("Beneficiário não encontrado.")
+
+                cursor.close()
+                conn.close()
+        except Exception as e:
+            print(f"Erro ao deletar Beneficiário: {e}")
