@@ -1,130 +1,49 @@
-from ..dao.ConnectionFactory import ConnectionFactory
-from ..model.Usuario import Usuario
+from datetime import date
 
-class UsuarioDAO:
+class Usuario:
+    def __init__(self, idUsuario=None, nome=None, email=None, senha=None):
+        self._idUsuario = idUsuario
+        self._nome = nome
+        self._email = email
+        self._senha = senha
 
-    def inserir(self, usuario):
-        if not usuario or not usuario.nome or not usuario.email or not usuario.senha:
-            raise ValueError("Nome, email e senha não podem ser nulos.")
+    @property
+    def idUsuario(self):
+        return self._idUsuario
 
-        insert_usuario_sql = """
-            INSERT INTO usuario (nome, email, senha)
-            VALUES (%s, %s, %s)
-        """
+    @idUsuario.setter
+    def idUsuario(self, value):
+        self._idUsuario = value
 
-        try:
-            # Conectar ao banco de dados
-            conn = ConnectionFactory.get_connection()
-            with conn.cursor() as cursor:
-                # Inserir os dados do usuário
-                cursor.execute(insert_usuario_sql, (
-                    usuario.nome,
-                    usuario.email,
-                    usuario.senha,
-                ))
+    @property
+    def nome(self):
+        return self._nome
 
-                # Confirmar a transação
-                conn.commit()
-                print("Usuário cadastrado com sucesso!")
+    @nome.setter
+    def nome(self, value):
+        if not isinstance(value, str):
+            raise TypeError("O nome deve ser uma string.")
+        self._nome = value
 
-        except Exception as e:
-            if conn:
-                conn.rollback()
-            print(f"Erro ao inserir usuário: {e}")
-            raise
+    @property
+    def email(self):
+        return self._email
 
-        finally:
-            if conn:
-                conn.close()
+    @email.setter
+    def email(self, value):
+        if not isinstance(value, str):
+            raise TypeError("O email deve ser uma string.")
+        self._email = value
 
-    def buscarPorId(self, usuario_id):
-        select_usuario_sql = """
-            SELECT
-                u.id_usuario AS id_usuario,
-                u.nome AS nome_usuario,
-                u.email AS email_usuario,
-                u.senha AS senha_usuario
-            FROM
-                usuario u
-            WHERE
-                u.id_usuario = %s;
-        """
+    @property
+    def senha(self):
+        return self._senha
 
-        try:
-            # Conectar ao banco de dados
-            conn = ConnectionFactory.get_connection()
-            with conn.cursor() as cursor:
-                cursor.execute(select_usuario_sql, (usuario_id,))
-                result = cursor.fetchone()
-                if result:
-                    return Usuario(idUsuario=result[0], nome=result[1], email=result[2], senha=result[3])
-                else:
-                    return None
+    @senha.setter
+    def senha(self, value):
+        if not isinstance(value, str):
+            raise TypeError("A senha deve ser uma string.")
+        self._senha = value
 
-        except Exception as e:
-            print(f"Erro ao buscar usuário por ID: {e}")
-            raise
-
-        finally:
-            if conn:
-                conn.close()
-
-    def atualizar(self, usuario):
-        sql_usuario = """
-        UPDATE usuario
-        SET nome = %s, email = %s, senha = %s
-        WHERE id_usuario = %s
-        """
-        try:
-            conn = ConnectionFactory.get_connection()
-            if conn:
-                cursor = conn.cursor()
-
-                # Atualizar os dados do usuário
-                cursor.execute(sql_usuario, (
-                    usuario.nome,
-                    usuario.email,
-                    usuario.senha,
-                    usuario.idUsuario
-                ))
-
-                conn.commit()
-                print("Usuário atualizado com sucesso!")
-
-                cursor.close()
-                conn.close()
-
-        except Exception as e:
-            print(f"Erro ao atualizar usuário: {e}")
-
-    def buscarPorEmail(self, email):
-        select_usuario_sql = """
-            SELECT
-                u.id_usuario AS id_usuario,
-                u.nome AS nome_usuario,
-                u.email AS email_usuario,
-                u.senha AS senha_usuario
-            FROM
-                usuario u
-            WHERE
-                u.email = %s;
-        """
-
-        try:
-            # Conectar ao banco de dados
-            conn = ConnectionFactory.get_connection()
-            with conn.cursor() as cursor:
-                cursor.execute(select_usuario_sql, (email,))
-                result = cursor.fetchone()
-                if result:
-                    return Usuario(idUsuario=result[0], nome=result[1], email=result[2], senha=result[3])
-                else:
-                    return None
-
-        except Exception as e:
-            print(f"Erro ao buscar usuário por email: {e}")
-            raise
-
-        finally:
-            if conn:
-                conn.close()
+    def __repr__(self):
+        return f"Usuario(idUsuario={self.idUsuario}, nome={self.nome}, email={self.email})"
