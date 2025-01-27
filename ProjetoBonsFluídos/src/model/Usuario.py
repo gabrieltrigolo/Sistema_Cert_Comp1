@@ -1,11 +1,12 @@
 from datetime import date
 
 class Usuario:
-    def __init__(self, idUsuario=None, nome=None, email=None, senha=None):
+    def __init__(self, idUsuario=None, nome=None, email=None, senha=None, cargo=None):
         self._idUsuario = idUsuario
         self._nome = nome
         self._email = email
         self._senha = senha
+        self._cargo = cargo
 
     @property
     def idUsuario(self):
@@ -45,5 +46,13 @@ class Usuario:
             raise TypeError("A senha deve ser uma string.")
         self._senha = value
 
+    @property
+    def cargo(self):
+        return self._cargo
+
+    @cargo.setter
+    def cargo(self, value):
+        self._cargo = value
+
     def __repr__(self):
-        return f"Usuario(idUsuario={self.idUsuario}, nome={self.nome}, email={self.email})"
+        return f"Usuario(idUsuario={self.idUsuario}, nome={self.nome}, email={self.email}, cargo={self.cargo})"

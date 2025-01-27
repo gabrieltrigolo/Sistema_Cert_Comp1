@@ -1,8 +1,14 @@
 from ..model.Produto import Produto
 from ..dao.ConnectionFactory import ConnectionFactory
+from typing import List, Optional
 
 class ProdutoDAO:
-    def inserir(self, produto):
+
+    def inserir(self, produto: Produto) -> None:
+        """
+        Insere um produto na tabela 'produto'.
+        :param produto: Objeto Produto contendo os dados a serem inseridos.
+        """
         sql = """
         INSERT INTO produto (nome, descricao, quantidade, data_doacao)
         VALUES (%s, %s, %s, %s)
@@ -27,7 +33,11 @@ class ProdutoDAO:
         except Exception as e:
             print(f"Erro ao inserir produto: {e}")
 
-    def atualizar(self, produto):
+    def atualizar(self, produto: Produto) -> None:
+        """
+        Atualiza os dados de um produto existente na tabela 'produto'.
+        :param produto: Objeto Produto contendo os dados atualizados.
+        """
         sql = """
         UPDATE produto
         SET nome = %s, descricao = %s, quantidade = %s, data_doacao = %s
@@ -54,7 +64,12 @@ class ProdutoDAO:
         except Exception as e:
             print(f"Erro ao atualizar produto: {e}")
 
-    def buscarPorId(self, produto_id):
+    def buscarPorId(self, produtoId: int) -> Optional[Produto]:
+        """
+        Busca um produto pelo ID na tabela 'produto'.
+        :param produto_id: ID do produto a ser buscado.
+        :return: Objeto Produto se encontrado, ou None se não encontrado.
+        """
         sql = """
         SELECT produto_id, nome, descricao, quantidade, data_doacao
         FROM produto
@@ -64,12 +79,18 @@ class ProdutoDAO:
             conn = ConnectionFactory.get_connection()
             if conn:
                 cursor = conn.cursor()
-                cursor.execute(sql, (produto_id,))
+                cursor.execute(sql, (produtoId,))
                 row = cursor.fetchone()
                 cursor.close()
                 conn.close()
                 if row:
-                    return Produto(*row)  # Presume que a classe Produto tem o mesmo construtor
+                    return Produto(
+                        idProduto=row[0],
+                        nome=row[1],
+                        descricao=row[2],
+                        quantidade=row[3],
+                        dataRecebimento=row[4]
+                    )
                 else:
                     print("Produto não encontrado.")
                     return None
@@ -77,7 +98,11 @@ class ProdutoDAO:
             print(f"Erro ao buscar produto por ID: {e}")
             return None
 
-    def listarTodosProdutos(self):
+    def listarTodosProdutos(self) -> List[Produto]:
+        """
+        Retorna todos os produtos da tabela 'produto'.
+        :return: Lista de objetos Produto.
+        """
         sql = """
         SELECT produto_id, nome, descricao, quantidade, data_doacao
         FROM produto
@@ -90,13 +115,25 @@ class ProdutoDAO:
                 rows = cursor.fetchall()
                 cursor.close()
                 conn.close()
-                produtos = [Produto(*row) for row in rows]
-                return produtos
+                return [
+                    Produto(
+                        idProduto=row[0],
+                        nome=row[1],
+                        descricao=row[2],
+                        quantidade=row[3],
+                        dataRecebimento=row[4]
+                    )
+                    for row in rows
+                ]
         except Exception as e:
             print(f"Erro ao listar produtos: {e}")
             return []
 
-    def deletar(self, produto_id):
+    def deletar(self, produtoId: int) -> None:
+        """
+        Deleta um produto pelo ID da tabela 'produto'.
+        :param produto_id: ID do produto a ser deletado.
+        """
         sql = """
         DELETE FROM produto
         WHERE produto_id = %s
@@ -105,7 +142,7 @@ class ProdutoDAO:
             conn = ConnectionFactory.get_connection()
             if conn:
                 cursor = conn.cursor()
-                cursor.execute(sql, (produto_id,))
+                cursor.execute(sql, (produtoId,))
                 conn.commit()
                 if cursor.rowcount > 0:
                     print("Produto deletado com sucesso!")

@@ -57,6 +57,82 @@ class DistribuicaoDAO:
             if conn:
                 conn.close()
 
+    def inserirEspecial(self, produto_nome, beneficiario_id, quantidade, data_distribuicao):
+        if not beneficiario_id or not produto_nome or quantidade <= 0:
+            raise ValueError("Beneficiário, nome do produto e quantidade devem ser válidos.")
+
+        # SQL para buscar os registros do produto pelo nome, ordenados por data de doação
+        select_produto_sql = """
+                    SELECT produto_id, quantidade 
+                    FROM produto 
+                    WHERE nome = %s AND quantidade > 0 
+                    ORDER BY data_doacao ASC
+                """
+        # SQL para inserir distribuição
+        insert_distribuicao_sql = """
+                    INSERT INTO distribuicao (beneficiario_id, produto_id, data_distribuicao, quantidade)
+                    VALUES (%s, %s, %s, %s)
+                """
+        # SQL para atualizar estoque
+        update_produto_sql = """
+                    UPDATE produto 
+                    SET quantidade = quantidade - %s 
+                    WHERE produto_id = %s
+                """
+
+        try:
+            conn = ConnectionFactory.get_connection()
+            with conn.cursor() as cursor:
+                conn.autocommit = False
+
+                # Buscar todos os registros do produto pelo nome no estoque
+                cursor.execute(select_produto_sql, (produto_nome,))
+                estoque = cursor.fetchall()
+
+                if not estoque:
+                    raise ValueError(f"Estoque do produto '{produto_nome}' está vazio ou indisponível.")
+
+                quantidade_a_distribuir = quantidade
+                for registro in estoque:
+                    produto_id, quantidade_disponivel = registro
+                    if quantidade_a_distribuir <= 0:
+                        break
+
+                    # Determinar a quantidade a retirar do registro atual
+                    quantidade_a_retirar = min(quantidade_a_distribuir, quantidade_disponivel)
+
+                    if quantidade_a_retirar > 0:  # Garantir que não inserimos registros com quantidade 0
+                        # Inserir distribuição
+                        cursor.execute(insert_distribuicao_sql, (
+                            beneficiario_id,
+                            produto_id,
+                            data_distribuicao,
+                            quantidade_a_retirar
+                        ))
+
+                        # Atualizar o estoque do produto
+                        cursor.execute(update_produto_sql, (quantidade_a_retirar, produto_id))
+
+                    # Atualizar a quantidade restante a distribuir
+                    quantidade_a_distribuir -= quantidade_a_retirar
+
+                # Verificar se toda a quantidade foi distribuída
+                if quantidade_a_distribuir > 0:
+                    raise ValueError(f"Estoque insuficiente para atender à quantidade solicitada de '{produto_nome}'.")
+
+                conn.commit()
+                print("Distribuição cadastrada com sucesso!")
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            print(f"Erro ao inserir distribuição: {e}")
+            raise
+
+        finally:
+            if conn:
+                conn.close()
+
     def buscarPorId(self, distribuicao_id):
         select_distribuicao_sql = """
             SELECT
@@ -140,65 +216,46 @@ class DistribuicaoDAO:
 
         except Exception as e:
             print(f"Erro ao atualizar distribuição: {e}")
-    #
-    # def consultar_por_id(self, id_distribuicao):
-    #     """
-    #     Consulta uma distribuição por seu ID e retorna seus detalhes.
-    #     :param id_distribuicao: ID da distribuição a ser consultada.
-    #     :return: Objeto Distribuicao com os dados correspondentes ou None se não encontrar.
-    #     """
-    #     sql_distribuicao = """
-    #     SELECT d.distribuicao_id, d.beneficiario_id, d.data_distribuicao, b.nome, b.email
-    #     FROM distribuicao d
-    #     JOIN beneficiario b ON d.beneficiario_id = b.beneficiario_id
-    #     WHERE d.distribuicao_id = %s
-    #     """
-    #     sql_produtos = """
-    #     SELECT p.produto_id, p.nome, dp.quantidade
-    #     FROM distribuicao_produtos dp
-    #     JOIN produto p ON dp.produto_id = p.produto_id
-    #     WHERE dp.distribuicao_id = %s
-    #     """
-    #
-    #     try:
-    #         conn = ConnectionFactory.get_connection()
-    #         if conn:
-    #             cursor = conn.cursor()
-    #
-    #             # Consultar a distribuição
-    #             cursor.execute(sql_distribuicao, (id_distribuicao,))
-    #             distribuicao_data = cursor.fetchone()
-    #
-    #             if distribuicao_data:
-    #                 # Criar objeto Beneficiario
-    #                 beneficiario = Beneficiario(idBeneficiario=distribuicao_data[1], nome=distribuicao_data[3],
-    #                                             email=distribuicao_data[4])
-    #
-    #                 # Criar objeto Distribuicao
-    #                 distribuicao = Distribuicao(idDistribuicao=distribuicao_data[0], beneficiario=beneficiario,
-    #                                             dataDistribuicao=distribuicao_data[2])
-    #
-    #                 # Consultar produtos da distribuição
-    #                 cursor.execute(sql_produtos, (id_distribuicao,))
-    #                 produtos = []
-    #                 for row in cursor.fetchall():
-    #                     produto = Produto(idProduto=row[0], nome=row[1], quantidade=row[2])
-    #                     produtos.append(produto)
-    #
-    #                 distribuicao.produtos = produtos
-    #                 return distribuicao
-    #             else:
-    #                 print(f"Distribuição com ID {id_distribuicao} não encontrada.")
-    #                 return None
-    #     except Exception as e:
-    #         print(f"Erro ao consultar distribuição: {e}")
-    #         return None
-    #     finally:
-    #         if cursor:
-    #             cursor.close()
-    #         if conn:
-    #             conn.close()
-    #
+
+    def buscarDistribuicoesPorBeneficiario(self, beneficiario_id):
+        select_distribuicoes_sql = """
+            SELECT 
+                d.distribuicao_id,
+                b.nome AS nome_beneficiario,
+                p.nome AS nome_produto,
+                d.quantidade,
+                d.data_distribuicao
+            FROM 
+                distribuicao d
+            JOIN 
+                beneficiario b ON d.beneficiario_id = b.beneficiario_id
+            JOIN 
+                produto p ON d.produto_id = p.produto_id
+            WHERE 
+                d.beneficiario_id = %s
+            ORDER BY 
+                d.data_distribuicao DESC;
+        """
+
+        try:
+            # Conectar ao banco de dados
+            conn = ConnectionFactory.get_connection()
+            with conn.cursor() as cursor:
+                cursor.execute(select_distribuicoes_sql, (beneficiario_id,))
+                result = cursor.fetchall()
+                if result:
+                    return result
+                else:
+                    return []
+
+        except Exception as e:
+            print(f"Erro ao buscar distribuições para o beneficiário {beneficiario_id}: {e}")
+            raise
+
+        finally:
+            if conn:
+                conn.close()
+
     # def relatorio_por_beneficiario(self, id_beneficiario):
     #     """
     #     Gera um relatório de todas as distribuições feitas a um beneficiário.
@@ -259,68 +316,80 @@ class DistribuicaoDAO:
     #         if conn:
     #             conn.close()
     #
-    # def relatorio_periodo(self, data_inicio, data_fim):
-    #     """
-    #     Gera um relatório de todas as distribuições feitas em um período específico.
-    #     :param data_inicio: Data de início do período.
-    #     :param data_fim: Data de fim do período.
-    #     :return: Lista de distribuições feitas no período.
-    #     """
-    #     sql = """
-    #     SELECT d.distribuicao_id, d.data_distribuicao, b.nome, b.email, p.produto_id, p.nome, dp.quantidade
-    #     FROM distribuicao d
-    #     JOIN beneficiario b ON d.beneficiario_id = b.beneficiario_id
-    #     JOIN distribuicao_produtos dp ON d.distribuicao_id = dp.distribuicao_id
-    #     JOIN produto p ON dp.produto_id = p.produto_id
-    #     WHERE d.data_distribuicao BETWEEN %s AND %s
-    #     ORDER BY d.data_distribuicao
-    #     """
-    #
-    #     try:
-    #         conn = ConnectionFactory.get_connection()
-    #         if conn:
-    #             cursor = conn.cursor()
-    #
-    #             # Consultar distribuições no período
-    #             cursor.execute(sql, (data_inicio, data_fim))
-    #             distribuições = {}
-    #
-    #             for row in cursor.fetchall():
-    #                 distribuicao_id = row[0]
-    #                 data_distribuicao = row[1]
-    #                 beneficiario_nome = row[2]
-    #                 beneficiario_email = row[3]
-    #                 produto_id = row[4]
-    #                 produto_nome = row[5]
-    #                 quantidade = row[6]
-    #
-    #                 if distribuicao_id not in distribuições:
-    #                     distribuições[distribuicao_id] = {
-    #                         'data_distribuicao': data_distribuicao,
-    #                         'beneficiario': Beneficiario(nome=beneficiario_nome, email=beneficiario_email),
-    #                         'produtos': []
-    #                     }
-    #
-    #                 # Adiciona o produto à lista de produtos da distribuição
-    #                 produto = Produto(idProduto=produto_id, nome=produto_nome, quantidade=quantidade)
-    #                 distribuições[distribuicao_id]['produtos'].append(produto)
-    #
-    #             # Organizar as distribuições em objetos Distribuicao
-    #             relatorio = []
-    #             for distribuicao_id, dados in distribuições.items():
-    #                 # Criando o objeto Distribuicao
-    #                 distribuicao = Distribuicao(idDistribuicao=distribuicao_id,
-    #                                             dataDistribuicao=dados['data_distribuicao'])
-    #                 distribuicao.beneficiario = dados['beneficiario']
-    #                 distribuicao.produtos = dados['produtos']
-    #                 relatorio.append(distribuicao)
-    #
-    #             return relatorio
-    #     except Exception as e:
-    #         print(f"Erro ao gerar relatório do período: {e}")
-    #         return []
-    #     finally:
-    #         if cursor:
-    #             cursor.close()
-    #         if conn:
-    #             conn.close()
+    def obterDistribuicoesPorPeriodo(self, data_inicio, data_fim):
+        """
+        Obtém as distribuições realizadas em um determinado período.
+        :param data_inicio: Data inicial do período (string no formato 'YYYY-MM-DD').
+        :param data_fim: Data final do período (string no formato 'YYYY-MM-DD').
+        :return: Lista de distribuições realizadas no período especificado.
+        """
+        if not data_inicio or not data_fim:
+            raise ValueError("As datas de início e fim devem ser fornecidas.")
+
+        query_sql = """
+            SELECT d.distribuicao_id, d.beneficiario_id, b.nome AS beneficiario_nome, 
+                   d.produto_id, p.nome AS produto_nome, d.data_distribuicao, d.quantidade
+            FROM distribuicao d
+            INNER JOIN beneficiario b ON d.beneficiario_id = b.beneficiario_id
+            INNER JOIN produto p ON d.produto_id = p.produto_id
+            WHERE d.data_distribuicao BETWEEN %s AND %s
+            ORDER BY d.data_distribuicao ASC
+        """
+
+        try:
+            # Conectar ao banco de dados
+            conn = ConnectionFactory.get_connection()
+            with conn.cursor(dictionary=True) as cursor:
+                # Executar a consulta
+                cursor.execute(query_sql, (data_inicio, data_fim))
+                distribuicoes = cursor.fetchall()
+                return distribuicoes
+
+        except Exception as e:
+            print(f"Erro ao obter distribuições por período: {e}")
+            raise
+
+        finally:
+            if conn:
+                conn.close()
+
+
+    def obterDistribuicoesPorMesEAno(self, mes, ano):
+        """
+        Obtém as distribuições realizadas em um determinado mês e ano.
+        :param mes: Mês do período (inteiro de 1 a 12).
+        :param ano: Ano do período (inteiro com 4 dígitos).
+        :return: Lista de distribuições realizadas no mês e ano especificados.
+        """
+        if not mes or not ano:
+            raise ValueError("O mês e o ano devem ser fornecidos.")
+
+        if not (1 <= mes <= 12):
+            raise ValueError("O mês deve estar entre 1 e 12.")
+
+        query_sql = """
+            SELECT d.distribuicao_id, d.beneficiario_id, b.nome AS beneficiario_nome, 
+                   d.produto_id, p.nome AS produto_nome, d.data_distribuicao, d.quantidade
+            FROM distribuicao d
+            INNER JOIN beneficiario b ON d.beneficiario_id = b.beneficiario_id
+            INNER JOIN produto p ON d.produto_id = p.produto_id
+            WHERE YEAR(d.data_distribuicao) = %s AND MONTH(d.data_distribuicao) = %s
+            ORDER BY d.data_distribuicao ASC
+        """
+
+        try:
+            # Conectar ao banco de dados
+            conn = ConnectionFactory.get_connection()
+            with conn.cursor(dictionary=True) as cursor:
+                # Executar a consulta
+                cursor.execute(query_sql, (ano, mes))
+                distribuicoes = cursor.fetchall()
+                return distribuicoes
+
+        except Exception as e:
+            print(f"Erro ao obter distribuições por mês e ano: {e}")
+            raise
+
+        finally:
+            if conn:
+                conn.close()

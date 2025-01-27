@@ -8,19 +8,19 @@ from src.dao.DistribuicaoDAO import DistribuicaoDAO
 if __name__ == "__main__":
     dao = ProdutoDAO()
     #
-    # # Teste do metodo inserir
-    # produto_novo1 = Produto(None, "Produto Teste1", "Descrição Teste45", 20, date(2025, 12, 31))
-    # produto_novo2 = Produto(None, "Produto Teste2", "Descrição Teste6464", 100, date.today())
-    # produto_novo3 = Produto(None, "Produto Teste3", "Descrição Teste4545", 50, date(2020, 12, 31))
-    # dao.inserir(produto_novo1)
-    # dao.inserir(produto_novo2)
-    # dao.inserir(produto_novo3)
+    # Teste do metodo inserir
+    produto_novo1 = Produto(None, "Produto Teste1", "Descrição Teste45", 20, date(2025, 12, 31))
+    produto_novo2 = Produto(None, "Produto Teste2", "Descrição Teste6464", 100, date.today())
+    produto_novo3 = Produto(None, "Produto Teste3", "Descrição Teste4545", 50, date(2020, 12, 31))
+    dao.inserir(produto_novo1)
+    dao.inserir(produto_novo2)
+    dao.inserir(produto_novo3)
     #
     # # Listar todos os produtos após a inserção
     # print("Produtos cadastrados:")
     # for produto in dao.listarTodosProdutos():
     #     print(vars(produto))
-    #
+
     # # Teste do metodo buscar_por_id
     # produto_id = 5  # Substitua pelo ID gerado ao inserir
     # produto = dao.buscarPorId(produto_id)

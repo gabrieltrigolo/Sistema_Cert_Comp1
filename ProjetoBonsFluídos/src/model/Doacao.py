@@ -1,14 +1,13 @@
 from datetime import date
 from ..model.Produto import Produto
-from ..model.Beneficiario import Beneficiario
 
 class Doacao:
-    def __init__(self, idDoacao=None, beneficiario=None, dataDoacao=None, produto=None, quantidade=None):
+    def __init__(self, idDoacao=None, dataDoacao=None, produto=None, quantidade=None, responsavel=None):
         self._idDoacao = idDoacao
-        self._beneficiario = beneficiario
         self._dataDoacao = dataDoacao
         self._produto = produto
         self._quantidade = quantidade
+        self._responsavel = responsavel
 
     @property
     def idDoacao(self):
@@ -17,16 +16,6 @@ class Doacao:
     @idDoacao.setter
     def idDoacao(self, value):
         self._idDoacao = value
-
-    @property
-    def beneficiario(self):
-        return self._beneficiario
-
-    @beneficiario.setter
-    def beneficiario(self, value: Beneficiario):
-        if not isinstance(value, Beneficiario) and value is not None:
-            raise TypeError("O beneficiário deve ser uma instância de Beneficiario ou None.")
-        self._beneficiario = value
 
     @property
     def dataDoacao(self):
@@ -58,9 +47,17 @@ class Doacao:
             raise TypeError("A quantidade deve ser um número inteiro ou None.")
         self._quantidade = value
 
+    @property
+    def responsavel(self):
+        return self._responsavel
+
+    @responsavel.setter
+    def responsavel(self, value):
+        self._responsavel = value
+
     def __repr__(self):
         return (
             f"Doacao(idDoacao={self.idDoacao}, "
-            f"beneficiario={self.beneficiario}, dataDoacao={self.dataDoacao}, "
-            f"produto={self.produto}, quantidade={self.quantidade})"
+            f"dataDoacao={self.dataDoacao}, "
+            f"produto={self.produto}, quantidade={self.quantidade}),responsavel={self.responsavel})"
         )

@@ -1,21 +1,23 @@
 from ..dao.ConnectionFactory import ConnectionFactory
 from ..model.Doacao import Doacao
 from ..model.Produto import Produto
-from ..model.Beneficiario import Beneficiario
 
 class DoacaoDAO:
 
     def inserir(self, doacao):
-        if not doacao or not doacao.beneficiario or not doacao.produto:
-            raise ValueError("Doação, beneficiário e produto não podem ser nulos.")
+        if not doacao  or not doacao.produto:
+            raise ValueError("Doação e produto não podem ser nulos.")
 
-        insert_doacao_sql = """
-            INSERT INTO doacao (beneficiario_id, produto_id, data_doacao, quantidade)
-            VALUES (%s, %s, %s, %s)
-        """
-        update_produto_sql = """
-            UPDATE produto SET quantidade = quantidade - %s WHERE produto_id = %s
-        """
+        # Inserir o produto na tabela produto
+        query_inserir_produto = """
+                        INSERT INTO produto (nome, descricao, quantidade, data_doacao)
+                        VALUES (%s, %s, %s, %s)
+                    """
+        # Inserir a doação na tabela doacao
+        query_inserir_doacao = """
+                        INSERT INTO doacao (produto_id, data_doacao, quantidade, doador)
+                        VALUES (%s, %s, %s, %s)
+                    """
 
         try:
             # Conectar ao banco de dados
@@ -24,25 +26,22 @@ class DoacaoDAO:
                 # Desabilitar commit automático
                 conn.autocommit = False
 
-                if doacao.produto.quantidade <= 0:
-                    raise ValueError(f"Quantidade inválida para o produto {doacao.produto.nome}.")
-
-                # Verificar a quantidade disponível no estoque
-                cursor.execute("SELECT quantidade FROM produto WHERE produto_id = %s", (doacao.produto.idProduto,))
-                estoque = cursor.fetchone()
-                if estoque is None or estoque[0] < doacao.produto.quantidade:
-                    raise ValueError(f"Estoque insuficiente para o produto {doacao.produto.nome}.")
+                cursor.execute(query_inserir_produto, (
+                    doacao.produto.nome,
+                    doacao.produto.descricao,
+                    doacao.produto.quantidade,
+                    doacao.produto.dataRecebimento))
+                # Obter o ID do produto inserido
+                produto_id = cursor.lastrowid
 
                 # Inserir os dados na tabela `doacao`
-                cursor.execute(insert_doacao_sql, (
-                    doacao.beneficiario.idBeneficiario,
-                    doacao.produto.idProduto,
+                cursor.execute(query_inserir_doacao, (
+                    produto_id,
                     doacao.dataDoacao,
                     doacao.quantidade,
+                    doacao.responsavel
                 ))
 
-                # Atualizar o estoque do produto
-                cursor.execute(update_produto_sql, (doacao.quantidade, doacao.produto.idProduto))
                 # Confirmar a transação
                 conn.commit()
                 print("Doação cadastrada com sucesso!")
@@ -52,30 +51,23 @@ class DoacaoDAO:
                 conn.rollback()
             print(f"Erro ao inserir doação: {e}")
             raise
-
         finally:
             if conn:
                 conn.close()
 
     def buscarPorId(self, doacao_id):
         select_doacao_sql = """
-            SELECT
-                d.doacao_id AS doacao_id,
-                b.nome AS beneficiario_nome,
-                b.email AS beneficiario_email,
-                b.cnpj_cpf AS beneficiario_cnpj_cpf,
-                p.nome AS produto_nome,
-                p.descricao AS produto_descricao,
-                d.data_doacao AS data_doacao,
-                d.quantidade AS quantidade_doada
-            FROM
-                doacao d
-            JOIN
-                beneficiario b ON d.beneficiario_id = b.beneficiario_id
-            JOIN
-                produto p ON d.produto_id = p.produto_id
-            WHERE
-                d.doacao_id = %s;
+            SELECT 
+                d.doacao_id,
+                d.doador,
+                p.nome AS nome_produto,
+                p.descricao,
+                d.quantidade AS quantidade_doada,
+                d.data_doacao
+            FROM doacao d
+            INNER JOIN produto p ON d.produto_id = p.produto_id
+            WHERE doacao_id = %s
+            ORDER BY d.data_doacao DESC;
         """
 
         try:
@@ -98,41 +90,61 @@ class DoacaoDAO:
                 conn.close()
 
     def atualizar(self, doacao):
-        sql_doacao = """
-        UPDATE doacao
-        SET beneficiario_id = %s, data_doacao = %s
-        WHERE doacao_id = %s
+        if not doacao or not doacao.produto:
+            raise ValueError("Doação e produto não podem ser nulos.")
+
+        # Query para atualizar a tabela produto
+        query_atualizar_produto = """
+            UPDATE produto 
+            SET nome = %s,
+                descricao = %s,
+                quantidade = %s,
+                data_doacao = %s
+            WHERE produto_id = %s
         """
-        sql_produtos_doacao = """
-        UPDATE doacao_produtos
-        SET quantidade = %s
-        WHERE doacao_id = %s AND produto_id = %s
+
+        # Query para atualizar a tabela doacao
+        query_atualizar_doacao = """
+            UPDATE doacao
+            SET data_doacao = %s,
+                quantidade = %s,
+                doador = %s
+            WHERE produto_id = %s
         """
+
         try:
+            # Conectar ao banco de dados
             conn = ConnectionFactory.get_connection()
-            if conn:
-                cursor = conn.cursor()
+            with conn.cursor() as cursor:
+                # Desabilitar commit automático
+                conn.autocommit = False
 
-                # Atualizar a doação
-                cursor.execute(sql_doacao, (
-                    doacao.beneficiario.idBeneficiario,
+                # Atualizar dados na tabela produto
+                cursor.execute(query_atualizar_produto, (
+                    doacao.produto.nome,
+                    doacao.produto.descricao,
+                    doacao.produto.quantidade,
+                    doacao.produto.dataRecebimento,
+                    doacao.produto.id
+                ))
+
+                # Atualizar dados na tabela doacao
+                cursor.execute(query_atualizar_doacao, (
                     doacao.dataDoacao,
-                    doacao.idDoacao
-                ))
-
-                # Atualizar os produtos na doação
-                cursor.execute(sql_produtos_doacao, (
                     doacao.quantidade,
-                    doacao.idDoacao,
-                    doacao.produto.idProduto
+                    doacao.responsavel,
+                    doacao.produto.id
                 ))
 
+                # Confirmar a transação
                 conn.commit()
                 print("Doação atualizada com sucesso!")
 
-                cursor.close()
-                conn.close()
-
         except Exception as e:
+            if conn:
+                conn.rollback()
             print(f"Erro ao atualizar doação: {e}")
-
+            raise
+        finally:
+            if conn:
+                conn.close()

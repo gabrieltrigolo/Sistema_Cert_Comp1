@@ -24,6 +24,7 @@ if __name__ == "__main__":
     # produto_dao.inserir(produto1)
     # produto_dao.inserir(produto2)
 
+    distribuicao_dao.inserirEspecial('Água', 1,22,date.today())
     # beneficiario1 = beneficiario_dao.buscarPorId('123.456.789-00')
     # produto1 = produto_dao.buscarPorId(2)
     #
@@ -36,11 +37,33 @@ if __name__ == "__main__":
     # for distribuicao in distribuicao_dao.listarDistribuicoes():
     #     print(distribuicao)
 
-    # Teste do metodo buscarPorId
-    distribuicao_id = 1  # Substitua pelo ID gerado ao inserir
-    distribuicao = distribuicao_dao.buscarPorId(distribuicao_id)
-    if distribuicao:
-        print("Distribuição encontrada:", distribuicao)
+    # # Teste do metodo buscarPorId
+    # distribuicao_id = 1  # Substitua pelo ID gerado ao inserir
+    # distribuicao = distribuicao_dao.buscarPorId(distribuicao_id)
+    # if distribuicao:
+    #     print("Distribuição encontrada:", distribuicao)
+
+    # beneficiario_id=1
+    # distribuicoes = distribuicao_dao.buscarDistribuicoesPorBeneficiario(beneficiario_id)
+    # if distribuicoes:
+    #     for dist in distribuicoes:
+    #         print(f"ID: {dist[0]}, Beneficiário: {dist[1]}, Produto: {dist[2]}, Quantidade: {dist[3]}, Data: {dist[4]}")
+    # else:
+    #     print(f"Nenhuma distribuição encontrada para o beneficiário ID {beneficiario_id}.")
+
+    # # Teste do metodo obterDistribuicoesPorPeriodo
+    # distribuicoes = distribuicao_dao.obterDistribuicoesPorPeriodo("2025-01-01", "2025-01-10")
+    # for dist in distribuicoes:
+    #     print(f"Distribuição ID: {dist['distribuicao_id']}, Produto: {dist['produto_nome']}, "
+    #           f"Beneficiário: {dist['beneficiario_nome']}, Quantidade: {dist['quantidade']}, "
+    #           f"Data: {dist['data_distribuicao']}")
+
+    # # Teste do metodo obterDistribuicoesPorMesEAno
+    # distribuicoes = distribuicao_dao.obterDistribuicoesPorMesEAno(1, 2025)
+    # for dist in distribuicoes:
+    #     print(f"Distribuição ID: {dist['distribuicao_id']}, Produto: {dist['produto_nome']}, "
+    #           f"Beneficiário: {dist['beneficiario_nome']}, Quantidade: {dist['quantidade']}, "
+    #           f"Data: {dist['data_distribuicao']}")
 
     # # Teste do metodo atualizar, usar junto com o teste buscarPorId
     # if distribuicao:

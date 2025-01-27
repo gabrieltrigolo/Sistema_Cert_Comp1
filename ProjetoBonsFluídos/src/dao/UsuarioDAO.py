@@ -4,127 +4,168 @@ from ..model.Usuario import Usuario
 class UsuarioDAO:
 
     def inserir(self, usuario):
-        if not usuario or not usuario.nome or not usuario.email or not usuario.senha:
-            raise ValueError("Nome, email e senha não podem ser nulos.")
-
-        insert_usuario_sql = """
-            INSERT INTO usuario (nome, email, senha)
-            VALUES (%s, %s, %s)
+        sql_check_email = """
+        SELECT 1 FROM usuario WHERE email = %s
         """
-
-        try:
-            # Conectar ao banco de dados
-            conn = ConnectionFactory.get_connection()
-            with conn.cursor() as cursor:
-                # Inserir os dados do usuário
-                cursor.execute(insert_usuario_sql, (
-                    usuario.nome,
-                    usuario.email,
-                    usuario.senha,
-                ))
-
-                # Confirmar a transação
-                conn.commit()
-                print("Usuário cadastrado com sucesso!")
-
-        except Exception as e:
-            if conn:
-                conn.rollback()
-            print(f"Erro ao inserir usuário: {e}")
-            raise
-
-        finally:
-            if conn:
-                conn.close()
-
-    def buscarPorId(self, usuario_id):
-        select_usuario_sql = """
-            SELECT
-                u.id_usuario AS id_usuario,
-                u.nome AS nome_usuario,
-                u.email AS email_usuario,
-                u.senha AS senha_usuario
-            FROM
-                usuario u
-            WHERE
-                u.id_usuario = %s;
+        sql_check_admin = """
+        SELECT 1 FROM usuario WHERE cargo = 'ADMIN'
         """
-
-        try:
-            # Conectar ao banco de dados
-            conn = ConnectionFactory.get_connection()
-            with conn.cursor() as cursor:
-                cursor.execute(select_usuario_sql, (usuario_id,))
-                result = cursor.fetchone()
-                if result:
-                    return Usuario(idUsuario=result[0], nome=result[1], email=result[2], senha=result[3])
-                else:
-                    return None
-
-        except Exception as e:
-            print(f"Erro ao buscar usuário por ID: {e}")
-            raise
-
-        finally:
-            if conn:
-                conn.close()
-
-    def atualizar(self, usuario):
-        sql_usuario = """
-        UPDATE usuario
-        SET nome = %s, email = %s, senha = %s
-        WHERE id_usuario = %s
+        sql_insert = """
+        INSERT INTO usuario (nome, senha, email, cargo)
+        VALUES (%s, %s, %s, %s)
         """
         try:
             conn = ConnectionFactory.get_connection()
             if conn:
                 cursor = conn.cursor()
 
-                # Atualizar os dados do usuário
-                cursor.execute(sql_usuario, (
-                    usuario.nome,
-                    usuario.email,
-                    usuario.senha,
-                    usuario.idUsuario
-                ))
+                # Verifica se o email já existe
+                cursor.execute(sql_check_email, (usuario.email,))
+                result_email = cursor.fetchone()
 
-                conn.commit()
-                print("Usuário atualizado com sucesso!")
+                if result_email:
+                    print("Usuário com este email já está cadastrado.")
+                else:
+                    # Verifica se há algum usuário com cargo "ADMIN"
+                    cursor.execute(sql_check_admin)
+                    result_admin = cursor.fetchone()
+
+                    # Define o cargo como "ADMIN" caso não haja nenhum usuário com esse cargo ou a tabela esteja vazia
+                    if not result_admin:
+                        usuario.cargo = "ADMIN"
+
+                    # Insere o novo usuário
+                    cursor.execute(sql_insert, (
+                        usuario.nome,
+                        usuario.senha,
+                        usuario.email,
+                        usuario.cargo
+                    ))
+                    conn.commit()
+                    if cursor.rowcount > 0:
+                        print(f"Usuário cadastrado com sucesso! Cargo: {usuario.cargo}")
+                    else:
+                        print("Usuário não cadastrado.")
 
                 cursor.close()
                 conn.close()
+        except Exception as e:
+            print(f"Erro ao inserir Usuário: {e}")
 
+    def buscarPorId(self, usuario_id):
+        sql = """
+        SELECT usuario_id, nome, senha, email, cargo
+        FROM usuario
+        WHERE usuario_id = %s
+        """
+        try:
+            conn = ConnectionFactory.get_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute(sql, (usuario_id,))
+                resultado = cursor.fetchone()
+                cursor.close()
+                conn.close()
+
+                if resultado:
+                    # Retorna um objeto Usuario
+                    return Usuario(
+                        idUsuario=resultado[0],
+                        nome=resultado[1],
+                        senha=resultado[2],
+                        email=resultado[3],
+                        cargo=resultado[4]
+                    )
+                else:
+                    print(f"Usuário com ID {usuario_id} não encontrado.")
+                    return None
+        except Exception as e:
+            print(f"Erro ao buscar usuário por ID: {e}")
+            return None
+
+    def atualizar(self, usuario_id, usuario):
+        sql_check_email = """
+        SELECT 1 FROM usuario WHERE email = %s AND usuario_id != %s
+        """
+        sql_update = """
+        UPDATE usuario
+        SET nome = %s, senha = %s, email = %s, cargo = %s
+        WHERE usuario_id = %s
+        """
+        try:
+            conn = ConnectionFactory.get_connection()
+            if conn:
+                cursor = conn.cursor()
+
+                # Verifica se o novo email já está sendo usado por outro usuário
+                cursor.execute(sql_check_email, (usuario.email, usuario_id))
+                result_email = cursor.fetchone()
+
+                if result_email:
+                    print("O email informado já está sendo utilizado por outro usuário.")
+                else:
+                    # Atualiza o usuário
+                    cursor.execute(sql_update, (
+                        usuario.nome,
+                        usuario.senha,
+                        usuario.email,
+                        usuario.cargo,
+                        usuario_id
+                    ))
+                    conn.commit()
+                    if cursor.rowcount > 0:
+                        print("Usuário atualizado com sucesso!")
+                    else:
+                        print(f"Usuário com ID {usuario_id} não foi atualizado. Verifique os dados.")
+
+                cursor.close()
+                conn.close()
         except Exception as e:
             print(f"Erro ao atualizar usuário: {e}")
 
-    def buscarPorEmail(self, email):
-        select_usuario_sql = """
-            SELECT
-                u.id_usuario AS id_usuario,
-                u.nome AS nome_usuario,
-                u.email AS email_usuario,
-                u.senha AS senha_usuario
-            FROM
-                usuario u
-            WHERE
-                u.email = %s;
-        """
-
+    def listarTodosUsuarios(self):
+        sql = "SELECT usuario_id, nome, email, cargo FROM usuario"
         try:
-            # Conectar ao banco de dados
             conn = ConnectionFactory.get_connection()
-            with conn.cursor() as cursor:
-                cursor.execute(select_usuario_sql, (email,))
-                result = cursor.fetchone()
-                if result:
-                    return Usuario(idUsuario=result[0], nome=result[1], email=result[2], senha=result[3])
-                else:
-                    return None
+            if conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql)
+                    resultados = cursor.fetchall()
 
+                    usuarios = []
+                    for result in resultados:
+                        usuarios.append({
+                            'usuario_id': result[0],
+                            'nome': result[1],
+                            'email': result[2],
+                            'cargo': result[3]
+                        })
+
+                    print(f"Listagem concluída. {len(usuarios)} usuário(s) encontrado(s).")
+                    return usuarios
         except Exception as e:
-            print(f"Erro ao buscar usuário por email: {e}")
-            raise
+            print(f"Erro ao listar usuários: {e}")
+            return []
+        finally:
+            if conn:
+                conn.close()
 
+
+    def deletar(self, usuario_id):
+        sql = "DELETE FROM usuario WHERE usuario_id = %s"
+        try:
+            conn = ConnectionFactory.get_connection()
+            if conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql, (usuario_id,))
+                    conn.commit()
+
+                    if cursor.rowcount > 0:
+                        print("Usuário deletado com sucesso!")
+                    else:
+                        print("Nenhum usuário foi deletado.")
+        except Exception as e:
+            print(f"Erro ao deletar usuário: {e}")
         finally:
             if conn:
                 conn.close()
