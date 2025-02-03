@@ -169,3 +169,33 @@ class UsuarioDAO:
         finally:
             if conn:
                 conn.close()
+
+
+    def verificarLogin(self, email, senha):
+        sql = """
+        SELECT * FROM usuario WHERE email = %s AND senha = %s
+        """
+        try:
+            conn = ConnectionFactory.get_connection()
+            if conn:
+                cursor = conn.cursor()
+
+                # Executa a query com os parâmetros
+                cursor.execute(sql, (email, senha))
+
+                # Verifica se encontrou algum usuário
+                result = cursor.fetchone()
+
+                cursor.close()
+                conn.close()
+
+                if result:
+                    print("Login realizado com sucesso!")
+                    return True
+                else:
+                    print("Email ou senha incorretos.")
+                    return False
+
+        except Exception as e:
+            print(f"Erro ao verificar login: {e}")
+            return False
