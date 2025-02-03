@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 
+from src.dao.UsuarioDAO import UsuarioDAO
+from src.model.Usuario import Usuario
+
 
 class PaginaInserirUsuario:
     def __init__(self):
@@ -25,18 +28,20 @@ class PaginaInserirUsuario:
         # Criando Tela
         self.tela = tk.Tk()
         self.tela.title("Inserir Usuário")
-        self.tela.geometry("700x400")
+        self.tela.geometry("700x500")
 
         # Criando Frames
         self.Nome_frame = tk.Frame(self.tela)
-        self.Data_frame = tk.Frame(self.tela)
+        self.Email_frame = tk.Frame(self.tela)
+        self.Senha_frame = tk.Frame(self.tela)
         self.CPF_frame = tk.Frame(self.tela)
         self.Permissao_frame = tk.Frame(self.tela)
         self.Botao_frame = tk.Frame(self.tela)
 
         # Colocando frames à tela
         self.Nome_frame.pack(pady=10)
-        self.Data_frame.pack()
+        self.Email_frame.pack()
+        self.Senha_frame.pack()
         self.CPF_frame.pack()
         self.Permissao_frame.pack()
         self.Botao_frame.pack(pady=20)
@@ -52,7 +57,8 @@ class PaginaInserirUsuario:
 
     def criar_rotulos(self):
         tk.Label(self.Nome_frame, text="Nome:", font=self.fonte, **self.conf_Label).pack()
-        tk.Label(self.Data_frame, text="Data de Nascimento:", font=self.fonte, **self.conf_Label).pack()
+        tk.Label(self.Email_frame, text="Email:", font=self.fonte, **self.conf_Label).pack()
+        tk.Label(self.Senha_frame, text="Senha:", font=self.fonte, **self.conf_Label).pack()
         tk.Label(self.CPF_frame, text="CPF:", font=self.fonte, **self.conf_Label).pack()
         tk.Label(self.Permissao_frame, text="Permissão:", font=self.fonte, **self.conf_Label).pack()
 
@@ -60,8 +66,11 @@ class PaginaInserirUsuario:
         self.Nome_entry = tk.Entry(self.Nome_frame, font=self.fonte, **self.conf_Entry)
         self.Nome_entry.pack()
 
-        self.Data_entry = tk.Entry(self.Data_frame, font=self.fonte, **self.conf_Entry)
-        self.Data_entry.pack()
+        self.Email_entry = tk.Entry(self.Email_frame, font=self.fonte, **self.conf_Entry)
+        self.Email_entry.pack()
+
+        self.Senha_entry = tk.Entry(self.Senha_frame, font=self.fonte, **self.conf_Entry)
+        self.Senha_entry.pack()
 
         self.CPF_entry = tk.Entry(self.CPF_frame, font=self.fonte, **self.conf_Entry)
         self.CPF_entry.pack()
@@ -97,11 +106,15 @@ class PaginaInserirUsuario:
 
     def inserir(self):
         nome = self.Nome_entry.get()
-        data_nasc = self.Data_entry.get()
-        cpf = self.CPF_entry.get()
+        email = self.Email_entry.get()
+        senha = self.Senha_entry.get()
+        # cpf = self.CPF_entry.get()
         permissao = self.Permissao_combobox.get()
+        user_novo1 = Usuario(None, nome, email, senha, permissao)
+        dao = UsuarioDAO()
+        dao.inserir(user_novo1)
 
-        print(f"Usuário Inserido: {nome}, {data_nasc}, {cpf}, Permissão: {permissao}")
+        print(f"Usuário Inserido: {nome}, {email}, {senha}, Permissão: {permissao}")
 
     def voltar(self):
         self.tela.destroy()

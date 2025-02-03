@@ -26,13 +26,13 @@ class UsuarioDAO:
                 if result_email:
                     print("Usuário com este email já está cadastrado.")
                 else:
-                    # Verifica se há algum usuário com cargo "ADMIN"
+                    # Verifica se há algum usuário com cargo "Administrador"
                     cursor.execute(sql_check_admin)
                     result_admin = cursor.fetchone()
 
                     # Define o cargo como "ADMIN" caso não haja nenhum usuário com esse cargo ou a tabela esteja vazia
                     if not result_admin:
-                        usuario.cargo = "ADMIN"
+                        usuario.cargo = "Administrador"
 
                     # Insere o novo usuário
                     cursor.execute(sql_insert, (
@@ -134,12 +134,7 @@ class UsuarioDAO:
 
                     usuarios = []
                     for result in resultados:
-                        usuarios.append({
-                            'usuario_id': result[0],
-                            'nome': result[1],
-                            'email': result[2],
-                            'cargo': result[3]
-                        })
+                        usuarios.append((result[0], result[1], result[2]))  # Retornando tuplas
 
                     print(f"Listagem concluída. {len(usuarios)} usuário(s) encontrado(s).")
                     return usuarios
@@ -149,7 +144,6 @@ class UsuarioDAO:
         finally:
             if conn:
                 conn.close()
-
 
     def deletar(self, usuario_id):
         sql = "DELETE FROM usuario WHERE usuario_id = %s"
