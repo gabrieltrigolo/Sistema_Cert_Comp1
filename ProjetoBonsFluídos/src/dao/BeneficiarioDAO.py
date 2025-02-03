@@ -99,7 +99,9 @@ class BeneficiarioDAO:
                 results = cursor.fetchall()
                 cursor.close()
                 conn.close()
-                beneficiarios = [Beneficiario(*row) for row in results]
+                beneficiarios = []
+                for result in results:
+                    beneficiarios.append((result[3], result[1], result[2]))
                 return beneficiarios
         except Exception as e:
             print(f"Erro ao listar Beneficiários: {e}")
