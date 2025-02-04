@@ -1,11 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.dao.BeneficiarioDAO import BeneficiarioDAO
-from src.dao.UsuarioDAO import UsuarioDAO
+from ProjetoBonsFluídos.src.dao.BeneficiarioDAO import BeneficiarioDAO
+from ProjetoBonsFluídos.src.dao.UsuarioDAO import UsuarioDAO
 
-
-class PaginaAtualizarBeneficiario:
+class PaginaAlterarBeneficiario:
     def __init__(self):
         # Configurações iniciais
         self.fonte = ("Arial", 12)

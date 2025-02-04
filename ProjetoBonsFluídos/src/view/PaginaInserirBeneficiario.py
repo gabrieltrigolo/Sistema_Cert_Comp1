@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.dao.BeneficiarioDAO import BeneficiarioDAO
-from src.model.Beneficiario import Beneficiario
+from ProjetoBonsFluídos.src.dao.BeneficiarioDAO import BeneficiarioDAO
+from ProjetoBonsFluídos.src.model.Beneficiario import Beneficiario
 
 
 class PaginaInserirBeneficiario:

@@ -1,9 +1,9 @@
 # Importando biblioteca Tkinter
 import tkinter as tk
 
-from PaginaAlterarBeneficiario import PaginaAtualizarBeneficiario
-from PaginaDeletarBeneficiario import PaginaDeletarBeneficiario
-from PaginaInserirBeneficiario import PaginaInserirBeneficiario
+import PaginaAlterarBeneficiario
+import PaginaDeletarBeneficiario
+import PaginaInserirBeneficiario
 
 
 class PaginaBeneficiario:
@@ -51,7 +51,7 @@ class PaginaBeneficiario:
 
     def Inserir_beneficiario(self):
         print("entrou Inserir Usuários")
-        tela_inserirbeneficiario = PaginaInserirBeneficiario()
+        tela_inserirbeneficiario = PaginaInserirBeneficiario.PaginaInserirBeneficiario()
         tela_inserirbeneficiario.tela.mainloop()
 
     def Deletar_beneficiario(self):
@@ -61,7 +61,7 @@ class PaginaBeneficiario:
 
     def Alterar_beneficiario(self):
         print("alterou Usuário")
-        tela_atualizarbeneficiario = PaginaAtualizarBeneficiario()
+        tela_atualizarbeneficiario = PaginaAlterarBeneficiario()
         tela_atualizarbeneficiario.tela.mainloop()
 
     def Voltar(self):

@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 from PaginaAdm import PaginaADM
-from src.dao.UsuarioDAO import UsuarioDAO
+from ProjetoBonsFluídos.src.dao.UsuarioDAO import UsuarioDAO
 
 #Criando dicionário de fontes e configs
 fonte = {
@@ -45,7 +45,7 @@ def entrar():
 tela = tk.Tk()
 
 tela.title("Login")
-tela.geometry("700x400")
+tela.geometry("700x500")
 
 #Criando Frames
 Nome_frame = tk.Frame(tela)

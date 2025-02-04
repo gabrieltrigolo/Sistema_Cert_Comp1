@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.dao.UsuarioDAO import UsuarioDAO
-from src.model.Usuario import Usuario
+from ProjetoBonsFluídos.src.dao.UsuarioDAO import UsuarioDAO
+from ProjetoBonsFluídos.src.model.Usuario import Usuario
 
 
 class PaginaInserirUsuario:

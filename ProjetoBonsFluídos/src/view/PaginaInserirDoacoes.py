@@ -2,9 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
 from datetime import date
-from src.dao.DoacaoDAO import DoacaoDAO
-from src.model.Produto import Produto
-from src.model.Doacao import Doacao
+from ProjetoBonsFluídos.src.dao.DoacaoDAO import DoacaoDAO
+from ProjetoBonsFluídos.src.model.Produto import Produto
+from ProjetoBonsFluídos.src.model.Doacao import Doacao
 
 
 class PaginaInserirDoacoes:

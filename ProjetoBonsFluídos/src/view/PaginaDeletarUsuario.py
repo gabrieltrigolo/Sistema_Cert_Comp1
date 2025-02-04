@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.dao.UsuarioDAO import UsuarioDAO
+from ProjetoBonsFluídos.src.dao.UsuarioDAO import UsuarioDAO
 
 
 class PaginaDeletarUsuario:
