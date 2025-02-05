@@ -111,7 +111,6 @@ class PaginaAlterarUsuario:
         Voltar_button.pack(side=tk.LEFT, padx=10)
 
     def atualizar_tabela(self):
-
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -124,11 +123,16 @@ class PaginaAlterarUsuario:
         categoria = self.Categoria_combobox.get()
         alterado = self.Alteracao_entry.get()
         dao = UsuarioDAO()
-        # Teste do metodo buscarPorId
-        user_id = self.ent_id.get()  # Substitua pelo ID gerado ao inserir
+        user_id = self.ent_id.get().strip()
+
+        # Verificar se o ID está preenchido
+        if not user_id:
+            messagebox.showerror("Erro", "Por favor, insira um ID válido.")
+            return
+
+        # Buscar usuário pelo ID
         usuario = dao.buscarPorId(user_id)
 
-        # Verificar se o usuário existe
         if usuario:
             if categoria == "Nome":
                 # Alterando o nome
@@ -138,12 +142,17 @@ class PaginaAlterarUsuario:
                 # Alterando o email
                 usuario.email = alterado
                 dao.atualizar(user_id, usuario)
-            messagebox.showinfo("Título", "Usuário alterado")
+            
+            messagebox.showinfo("Sucesso", "Usuário alterado com sucesso!")
             self.atualizar_tabela()
         else:
-            messagebox.showerror("Título", "Usuário não encontrado.")
+            messagebox.showerror("Erro", "Usuário não encontrado.")
+
     def voltar(self):
-        self.tela.destroy()
+        confirmacao = messagebox.askyesno("Confirmar", "Tem certeza que deseja voltar?")
+        if confirmacao:
+            messagebox.showinfo("Saindo", "Voltando para a tela anterior.")
+            self.tela.destroy()
 
 # Executar a aplicação
 if __name__ == "__main__":
