@@ -113,8 +113,6 @@ class PaginaLogin:
         self.tela.withdraw()  # Oculta a tela de login
         self.tela_inserirusuario = PaginaInserirUsuario(self.tela)
 
-
-
 # Executar a aplicação
 if __name__ == "__main__":
     app = PaginaLogin()

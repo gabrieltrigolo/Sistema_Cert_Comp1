@@ -115,8 +115,5 @@ class PaginaDeletarBeneficiario:
             messagebox.showinfo("Sucesso", "Beneficiário deletado com sucesso!")
 
     def voltar(self):
-        confirmacao = messagebox.askyesno("Confirmar", "Tem certeza que deseja voltar?")
-        if confirmacao:
-            messagebox.showinfo("Sucesso", "Voltando.")
-            self.tela.destroy()
+        self.tela.destroy()
 

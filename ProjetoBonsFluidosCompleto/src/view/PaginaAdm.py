@@ -1,6 +1,6 @@
 #Importando biblioteca Tkinter
 import tkinter as tk
-
+from tkinter import ttk, messagebox
 from src.view.PaginaBeneficiario import PaginaBeneficiario
 from src.view.PaginaDistribuicao import PaginaDistribuicao
 from src.view.PaginaDoacoes import PaginaDoacoes
@@ -23,17 +23,7 @@ class PaginaADM:
 		# Criando a janela principal
 		self.tela = tk.Tk()
 		self.tela.title("Adm")
-		# Definir o tamanho da janela
-		largura_janela = 700
-		altura_janela = 450
-		# Obter o tamanho da tela
-		largura_tela = self.tela.winfo_screenwidth()
-		altura_tela = self.tela.winfo_screenheight()
-		# Calcular a posição x e y para centralizar a janela
-		pos_x = (largura_tela - largura_janela) // 2
-		pos_y = (altura_tela - altura_janela) // 2
-		# Definir a geometria da janela
-		self.tela.geometry(f"{largura_janela}x{altura_janela}+{pos_x}+{pos_y}")
+		self.tela.geometry("700x450")
 
 		# Criando Frame
 		self.Botao_frame = tk.Frame(self.tela)
@@ -85,5 +75,7 @@ class PaginaADM:
 		tela_relatorio = PaginaRelatorio(nova_janela)  # Passa a nova janela como root
 
 	def Tela_sair(self):
-		self.tela.destroy()
+		confirmacao = messagebox.askyesno("Confirmar", "Tem certeza que deseja sair do programa?")
+		if confirmacao:
+			self.tela.destroy()
 

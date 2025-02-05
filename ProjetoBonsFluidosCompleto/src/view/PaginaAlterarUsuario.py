@@ -160,8 +160,5 @@ class PaginaAlterarUsuario:
             messagebox.showerror("Erro", "Usuário não encontrado.")
 
     def voltar(self):
-        confirmacao = messagebox.askyesno("Confirmar", "Tem certeza que deseja voltar?")
-        if confirmacao:
-            messagebox.showinfo("Saindo", "Voltando para a tela anterior.")
-            self.tela.destroy()
+        self.tela.destroy()
 

@@ -143,8 +143,6 @@ class PaginaAlterarPermissoes:
             messagebox.showerror("Erro", "Usuário não encontrado.")
 
     def voltar(self):
-        confirmacao = messagebox.askyesno("Confirmar", "Tem certeza que deseja voltar?")
-        if confirmacao:
-            self.tela.destroy()
+        self.tela.destroy()
 
 
