@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
-
+from tkinter import ttk, messagebox
 from src.dao.BeneficiarioDAO import BeneficiarioDAO
 
 
@@ -17,7 +16,7 @@ class PaginaAlterarBeneficiario:
 
         # Criando a janela principal
         self.tela = tk.Tk()
-        self.tela.title("Alterar Beneficiario")
+        self.tela.title("Alterar Beneficiário")
         self.tela.geometry("700x500")
 
         # Criando Frames
@@ -104,7 +103,6 @@ class PaginaAlterarBeneficiario:
         Voltar_button.pack(side=tk.LEFT, padx=10)
 
     def atualizar_tabela(self):
-
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -116,26 +114,36 @@ class PaginaAlterarBeneficiario:
     def alterar(self):
         categoria = self.Categoria_combobox.get()
         alterado = self.Alteracao_entry.get()
+        beneficiario_id = self.ent_id.get()
+
+        if not beneficiario_id.strip():
+            messagebox.showerror("Erro", "Por favor, insira um CPF ou CNPJ válido.")
+            return
+
         dao = BeneficiarioDAO()
-        # Teste do metodo buscarPorId
-        beneficiario_id = self.ent_id.get()  # Substitua pelo ID gerado ao inserir
         beneficiario = dao.buscarPorId(beneficiario_id)
 
-        # Verificar se o usuário existe
         if beneficiario:
             if categoria == "Nome":
-                # Alterando o nome
                 beneficiario.nome = alterado
-                dao.atualizar(beneficiario)
             elif categoria == "Email":
-                # Alterando o email
                 beneficiario.email = alterado
-                dao.atualizar(beneficiario)
-            print(f"{categoria} {alterado} Alterar")
+
+            # Atualizando o beneficiário no banco de dados
+            dao.atualizar(beneficiario)
+
+            messagebox.showinfo("Sucesso", f"{categoria} do beneficiário alterada com sucesso!")
             self.atualizar_tabela()
         else:
-            print("Usuário não encontrado.")
-    def voltar(self):
-        print("Voltar")
-        self.tela.destroy()
+            messagebox.showerror("Erro", "Beneficiário não encontrado.")
 
+    def voltar(self):
+        confirmacao = messagebox.askyesno("Confirmar", "Tem certeza que deseja voltar?")
+        if confirmacao:
+            self.tela.destroy()
+
+
+# Executar a aplicação
+if __name__ == "__main__":
+    app = PaginaAlterarBeneficiario()
+    tk.mainloop()
