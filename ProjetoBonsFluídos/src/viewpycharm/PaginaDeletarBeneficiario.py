@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from src.dao.BeneficiarioDAO import BeneficiarioDAO
 
@@ -55,18 +55,11 @@ class PaginaDeletarBeneficiario:
             self.tree.heading(col, text=col)
 
         # Definindo o tamanho das colunas
-        # self.tree.column("ID", width=50)
         self.tree.column("Nome", width=150)
         self.tree.column("Email", width=200)
         self.tree.column("CPF ou CNPJ", width=200)
 
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-
-        dao = BeneficiarioDAO()
-        beneficiarios = dao.listarTodosBeneficiarios()
-        for beneficiario in beneficiarios:
-            self.tree.insert("", tk.END, values=beneficiario)
+        self.atualizar_tabela()
 
         # Posicionando a tabela na janela
         self.tree.pack(expand=True, fill="both")
@@ -81,7 +74,6 @@ class PaginaDeletarBeneficiario:
         for beneficiario in beneficiarios:
             self.tree.insert("", tk.END, values=beneficiario)
 
-
     def criar_botoes(self):
         Deletar_button = tk.Button(self.Botao_frame, text="Deletar", command=self.deletar, font=self.fonte,
                                    **self.conf_Button)
@@ -93,15 +85,31 @@ class PaginaDeletarBeneficiario:
         Voltar_button.pack(side=tk.LEFT, padx=10)
 
     def deletar(self):
-        print("Deletar")
-        id = self.ent_id.get()
+        cpf_cnpj = self.ent_id.get().strip()
+
+        if not cpf_cnpj:
+            messagebox.showerror("Erro", "Por favor, insira um CPF ou CNPJ válido.")
+            return
+
         dao = BeneficiarioDAO()
-        dao.deletarBeneficiario(id)
-        self.atualizar_tabela()
+        beneficiario = dao.buscarBeneficiarioPorCpfCnpj(cpf_cnpj)
+
+        if not beneficiario:
+            messagebox.showerror("Erro", "Beneficiário não encontrado!")
+            return
+
+        confirmacao = messagebox.askyesno("Confirmar", f"Tem certeza que deseja deletar o beneficiário com CPF/CNPJ {cpf_cnpj}?")
+        if confirmacao:
+            dao.deletarBeneficiario(cpf_cnpj)
+            self.atualizar_tabela()
+            messagebox.showinfo("Sucesso", "Beneficiário deletado com sucesso!")
 
     def voltar(self):
-        print("Voltar")
-        self.tela.destroy()
+        confirmacao = messagebox.askyesno("Confirmar", "Tem certeza que deseja sair?")
+        if confirmacao:
+            messagebox.showinfo("Sucesso", "Saindo do programa.")
+            self.tela.destroy()
+
 
 # Executar a aplicação
 if __name__ == "__main__":
