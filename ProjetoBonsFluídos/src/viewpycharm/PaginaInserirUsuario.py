@@ -1,9 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-
 from src.dao.UsuarioDAO import UsuarioDAO
 from src.model.Usuario import Usuario
-
 
 class PaginaInserirUsuario:
     def __init__(self):
@@ -104,11 +102,21 @@ class PaginaInserirUsuario:
         email = self.Email_entry.get()
         senha = self.Senha_entry.get()
         permissao = self.Permissao_combobox.get()
-        user_novo1 = Usuario(None, nome, email, senha, permissao)
-        dao = UsuarioDAO()
-        dao.inserir(user_novo1)
-        messagebox.showinfo("Título", "Usuário inserido com sucesso")
+
+        # Verificação de campos vazios
+        if not nome or not email or not senha:
+            messagebox.showerror("Erro", "Por favor, preencha todos os campos.")
+            return
+
+        try:
+            # Criação do objeto Usuario e inserção no banco de dados
+            user_novo1 = Usuario(None, nome, email, senha, permissao)
+            dao = UsuarioDAO()
+            dao.inserir(user_novo1)
+            messagebox.showinfo("Sucesso", "Usuário inserido com sucesso!")
+        except Exception as e:
+            # Exibição de erro caso algo dê errado
+            messagebox.showerror("Erro", f"Falha ao inserir o usuário: {str(e)}")
+
     def voltar(self):
         self.tela.destroy()
-
-
