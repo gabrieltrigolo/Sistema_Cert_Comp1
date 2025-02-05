@@ -100,6 +100,6 @@ class PaginaDistribuicao:
         tela_deletardistribuicao.tela.mainloop()
 
     def Voltar(self):
-        print("voltou")
+        self.tela.destroy()
 
 

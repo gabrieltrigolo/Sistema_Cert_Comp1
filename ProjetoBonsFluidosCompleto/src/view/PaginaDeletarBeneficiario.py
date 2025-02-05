@@ -92,7 +92,7 @@ class PaginaDeletarBeneficiario:
             return
 
         dao = BeneficiarioDAO()
-        beneficiario = dao.buscarBeneficiarioPorCpfCnpj(cpf_cnpj)
+        beneficiario = dao.buscarPorId(cpf_cnpj)
 
         if not beneficiario:
             messagebox.showerror("Erro", "Beneficiário não encontrado!")
