@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from tkcalendar import DateEntry
 from datetime import date
 from src.dao.DoacaoDAO import DoacaoDAO
 from src.model.Produto import Produto
