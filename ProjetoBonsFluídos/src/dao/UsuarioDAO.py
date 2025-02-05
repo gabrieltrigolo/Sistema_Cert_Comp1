@@ -31,7 +31,7 @@ class UsuarioDAO:
                 result_admin = cursor.fetchone()
 
                 # Define o cargo como "Administrador" caso não haja nenhum usuário com esse cargo ou a tabela esteja vazia
-                if not result_admin:
+                if not result_admin and usuario.cargo is None:
                     usuario.cargo = "Administrador"
 
                 # Insere o novo usuário
@@ -171,40 +171,32 @@ class UsuarioDAO:
 
     def verificarLogin(self, email, senha):
         sql = """
-        SELECT id, nome, tipo_usuario FROM usuario 
+        SELECT usuario_id, nome, cargo FROM usuario 
         WHERE email = %s AND senha = %s
         """
         try:
             conn = ConnectionFactory.get_connection()
-            if conn:
-                cursor = conn.cursor()
-                # Executa a query com os parâmetros
+            with conn.cursor() as cursor:
                 cursor.execute(sql, (email, senha))
-                # Verifica se encontrou algum usuário
                 result = cursor.fetchone()
-                cursor.close()
-                conn.close()
 
-                if result:
-                    # Cria um dicionário com as informações do usuário
-                    usuario = {
-                        "id": result[0],
-                        "nome": result[1],
-                        "tipo": result[2]
-                    }
+            if result:
+                usuario = {
+                    "id": result[0],
+                    "nome": result[1],
+                    "tipo": result[2]
+                }
+                print(f"Login realizado com sucesso! Usuário: {usuario['nome']}")
 
-                    print("Login realizado com sucesso!")
-
-                    # Redireciona baseado no tipo de usuário
-                    if usuario["tipo"].upper() == "ADM":
-                        print("Redirecionando para tela de administrador...")
-                        return {"sucesso": True, "tipo": "ADM", "usuario": usuario}
-                    else:
-                        print("Redirecionando para tela de visitante...")
-                        return {"sucesso": True, "tipo": "VISITANTE", "usuario": usuario}
+                if usuario["tipo"] == "Administrador":
+                    print("Redirecionando para tela de administrador...")
+                    return {"sucesso": True, "tipo": "Administrador", "usuario": usuario}
                 else:
-                    print("Email ou senha incorretos.")
-                    return {"sucesso": False, "mensagem": "Credenciais inválidas"}
+                    print("Redirecionando para tela de visitante...")
+                    return {"sucesso": True, "tipo": "Visitante/Usuario", "usuario": usuario}
+            else:
+                print("Email ou senha incorretos.")
+                return {"sucesso": False, "mensagem": "Credenciais inválidas"}
 
         except Exception as e:
             print(f"Erro ao verificar login: {e}")

@@ -107,7 +107,6 @@ class PaginaInserirUsuario:
         if not nome or not email or not senha:
             messagebox.showerror("Erro", "Por favor, preencha todos os campos.")
             return
-
         try:
             # Criação do objeto Usuario e inserção no banco de dados
             user_novo1 = Usuario(None, nome, email, senha, permissao)
@@ -120,3 +119,4 @@ class PaginaInserirUsuario:
 
     def voltar(self):
         self.tela.destroy()
+

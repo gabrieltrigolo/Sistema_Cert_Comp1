@@ -74,7 +74,8 @@ class PaginaInserirDistribuicao:
     def carregar_produtos(self):
         dao = ProdutoDAO()
         produtos = dao.listarTodosProdutos()
-        nomes_produtos = [produto[0] for produto in produtos]  # Pegando apenas os nomes dos produtos
+        nomes_produtos = list({produto[0] for produto in
+                               produtos})  # Usando set para remover duplicatas e convertendo de volta para lista
         self.Produto_combobox["values"] = nomes_produtos
         if nomes_produtos:
             self.Produto_combobox.current(0)  # Seleciona o primeiro produto por padrão

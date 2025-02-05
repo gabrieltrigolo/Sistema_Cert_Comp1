@@ -31,25 +31,22 @@ def entrar():
 	email = Nome_entry.get()  # Assumindo que Nome_entry é para o email
 	senha = Senha_entry.get()
 
-	usuario_dao = UsuarioDAO()
-	login_sucesso = usuario_dao.verificarLogin(email, senha)
-	# if resultado["sucesso"]:
-	# 	if resultado["tipo"] == "Administrador":
-	# 		tela_adm = PaginaADM()
-	# 		tela_adm.tela.mainloop()
-	# 	else:
-	# 		tela_visit = PaginaADM()
-	# 		tela_visit.tela.mainloop()
-	# else:
-	# 	# Mostrar mensagem de erro
-	# 	messagebox.showerror("Erro de Login", "Email ou senha incorretos!")
+	try:
+		usuario_dao = UsuarioDAO()
+		resultado = usuario_dao.verificarLogin(email, senha)
 
-	if login_sucesso:
-		tela_adm = PaginaADM()
-		tela_adm.tela.mainloop()
-	else:
-		# Caso queira mostrar uma mensagem de erro em uma janela
-		messagebox.showerror("Erro de Login", "Email ou senha incorretos!")
+		if resultado["sucesso"]:
+			if resultado["tipo"] == "Administrador":
+				tela_adm = PaginaADM()
+				tela_adm.tela.mainloop()
+			else:
+				print("oi")
+				# tela_visit = PaginaVisitante()  # Classe correta para visitantes
+				# tela_visit.tela.mainloop()
+		else:
+			messagebox.showerror("Erro de Login", "Email ou senha incorretos!")
+	except Exception as e:
+		messagebox.showerror("Erro", f"Ocorreu um erro: {str(e)}")
 
 def cadastrar():
 	tela_inserirusuario = PaginaInserirUsuario()

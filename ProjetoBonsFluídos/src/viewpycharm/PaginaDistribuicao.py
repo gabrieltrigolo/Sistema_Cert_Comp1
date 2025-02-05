@@ -2,6 +2,7 @@
 import tkinter as tk
 
 from src.view.PaginaInserirDistribuicao import PaginaInserirDistribuicao
+from src.view.PaginaDeletarDistribuicao import PaginaDeletarDistribuicao
 
 
 class PaginaDistribuicao:
@@ -53,8 +54,8 @@ class PaginaDistribuicao:
     
     def Deletar_distribuicao(self):
         print("entrou Inserir Usuários")
-        tela_inserirdistribuicao = PaginaInserirDistribuicao()
-        tela_inserirdistribuicao.tela.mainloop()
+        tela_deletardistribuicao = PaginaDeletarDistribuicao()
+        tela_deletardistribuicao.tela.mainloop()
 
     def Voltar(self):
         print("voltou")

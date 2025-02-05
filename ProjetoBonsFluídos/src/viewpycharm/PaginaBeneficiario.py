@@ -65,4 +65,4 @@ class PaginaBeneficiario:
         tela_atualizarbeneficiario.tela.mainloop()
 
     def Voltar(self):
-        print("voltou")
+        self.tela.destroy()

@@ -9,7 +9,7 @@ from src.dao.UsuarioDAO import UsuarioDAO
 from src.model.Beneficiario import Beneficiario
 
 
-class PaginaInserirDistribuicao:
+class PaginaDeletarDistribuicao:
     def __init__(self):
         # Configurações iniciais
         self.fonte = ("Arial", 12)
@@ -120,8 +120,3 @@ class PaginaInserirDistribuicao:
     def voltar(self):
         self.tela.destroy()
 
-
-# Executar a aplicação
-if __name__ == "__main__":
-    app = PaginaInserirDistribuicao()
-    tk.mainloop()

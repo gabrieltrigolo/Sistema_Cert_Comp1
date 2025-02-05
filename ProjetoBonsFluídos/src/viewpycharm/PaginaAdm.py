@@ -1,7 +1,10 @@
 #Importando biblioteca Tkinter
 import tkinter as tk
 
-from PaginaUsuario import PaginaUsuario
+from src.view.PaginaBeneficiario import PaginaBeneficiario
+from src.view.PaginaDistribuicao import PaginaDistribuicao
+from src.view.PaginaInserirDoacoes import PaginaInserirDoacoes
+from src.view.PaginaUsuario import PaginaUsuario
 
 
 class PaginaADM:
@@ -31,10 +34,10 @@ class PaginaADM:
 		# Lista de tuplas com (texto, comando)
 		botoes = [
 			("Usuários", self.Tela_usuarios),
-			("Dados", self.Tela_dados),
-			("Relatório", self.Tela_relatorio),
-			("Histórico", self.Tela_historico),
-			("Configurações", self.Tela_configuracoes),
+			("Beneficiarios", self.Tela_beneficiarios),
+			("Doações", self.Tela_doacoes),
+			("Distribuição", self.Tela_distribuicao),
+			("Relatórios", self.Tela_relatorios),
 			("Sair", self.Tela_sair)
 		]
 
@@ -53,20 +56,23 @@ class PaginaADM:
 		tela_usuario = PaginaUsuario()
 		tela_usuario.tela.mainloop()
 
-	def Tela_dados(self):
-		print("entrou Tela_Dados")
+	def Tela_beneficiarios(self):
+		tela_beneficiario = PaginaBeneficiario()
+		tela_beneficiario.tela.mainloop()
 
-	def Tela_relatorio(self):
-		print("entrou Tela_relatorio")
+	def Tela_doacoes(self):
+		tela_doacoes = PaginaInserirDoacoes()
+		tela_doacoes.tela.mainloop()
 
-	def Tela_historico(self):
-		print("entrou Tela_historico")
+	def Tela_distribuicao(self):
+		tela_distribuicao = PaginaDistribuicao()
+		tela_distribuicao.tela.mainloop()
 
-	def Tela_configuracoes(self):
-		print("entrou Tela_configuracoes")
+	def Tela_relatorios(self):
+		print("entrou Tela_relatorios")
 
 	def Tela_sair(self):
-		print("entrou Tela_sair")
+		self.tela.destroy()
 
 # Executar a aplicação
 if __name__ == "__main__":
