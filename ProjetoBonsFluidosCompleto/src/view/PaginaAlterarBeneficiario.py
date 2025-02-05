@@ -17,7 +17,17 @@ class PaginaAlterarBeneficiario:
         # Criando a janela principal
         self.tela = tk.Tk()
         self.tela.title("Alterar Beneficiário")
-        self.tela.geometry("700x500")
+        # Definir o tamanho da janela
+        largura_janela = 700
+        altura_janela = 500
+        # Obter o tamanho da tela
+        largura_tela = self.tela.winfo_screenwidth()
+        altura_tela = self.tela.winfo_screenheight()
+        # Calcular a posição x e y para centralizar a janela
+        pos_x = (largura_tela - largura_janela) // 2
+        pos_y = (altura_tela - altura_janela) // 2
+        # Definir a geometria da janela
+        self.tela.geometry(f"{largura_janela}x{altura_janela}+{pos_x}+{pos_y}")
 
         # Criando Frames
         self.Tabela_frame = tk.Frame(self.tela)
