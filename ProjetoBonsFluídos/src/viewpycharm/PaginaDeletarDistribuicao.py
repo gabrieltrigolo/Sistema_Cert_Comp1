@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from datetime import date
 
 from src.dao.BeneficiarioDAO import BeneficiarioDAO
@@ -60,31 +60,17 @@ class PaginaInserirDistribuicao:
             self.tree.heading(col, text=col)
 
         # Definindo o tamanho das colunas
-        # self.tree.column("ID", width=50)
         self.tree.column("Distribuição ID", width=150)
         self.tree.column("Nome Beneficiario", width=200)
         self.tree.column("Quantidade", width=200)
         self.tree.column("Data", width=200)
 
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-
-        dao = DistribuicaoDAO()
-        distribuicoes = dao.buscarTodasDistribuicoes()
-        for distribuicao in distribuicoes:
-            campos_filtrados = (
-                distribuicao[0],  # Distribuição ID
-                distribuicao[1],  # Beneficiario NOME (confira se é o ID ou nome)
-                distribuicao[7],  # Quantidade
-                distribuicao[6]  # Data
-            )
-            self.tree.insert("", tk.END, values=campos_filtrados)
+        self.atualizar_tabela()
 
         # Posicionando a tabela na janela
         self.tree.pack(expand=True, fill="both")
 
     def atualizar_tabela(self):
-
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -93,9 +79,9 @@ class PaginaInserirDistribuicao:
         for distribuicao in distribuicoes:
             campos_filtrados = (
                 distribuicao[0],  # Distribuição ID
-                distribuicao[1],  # Beneficiario NOME (confira se é o ID ou nome)
+                distribuicao[1],  # Beneficiario NOME
                 distribuicao[7],  # Quantidade
-                distribuicao[6]  # Data
+                distribuicao[6]   # Data
             )
             self.tree.insert("", tk.END, values=campos_filtrados)
 
@@ -110,14 +96,26 @@ class PaginaInserirDistribuicao:
         Voltar_button.pack(side=tk.LEFT, padx=10)
 
     def deletar(self):
-        print("Deletar")
-        id = self.ent_id.get()
+        id = self.ent_id.get().strip()  # Remove espaços extras
+
+        if not id.isdigit():
+            messagebox.showerror("Erro", "Por favor, insira um ID válido (somente números).")
+            return
+
         dao = DistribuicaoDAO()
-        dao.deletarDistribuicaoPorId(id)
-        self.atualizar_tabela()
+        distribuicao = dao.buscarDistribuicaoPorId(id)
+
+        if not distribuicao:
+            messagebox.showerror("Erro", "Distribuição não encontrada!")
+            return
+
+        confirmacao = messagebox.askyesno("Confirmar", f"Tem certeza que deseja deletar a distribuição ID {id}?")
+        if confirmacao:
+            dao.deletarDistribuicaoPorId(id)
+            self.atualizar_tabela()
+            messagebox.showinfo("Sucesso", "Distribuição deletada com sucesso!")
 
     def voltar(self):
-        print("Voltar")
         self.tela.destroy()
 
 
