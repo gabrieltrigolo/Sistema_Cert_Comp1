@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-
 from src.dao.UsuarioDAO import UsuarioDAO
 
 class PaginaDeletarUsuario:
@@ -60,19 +59,13 @@ class PaginaDeletarUsuario:
         self.tree.column("Nome", width=150)
         self.tree.column("Email", width=200)
 
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-
-        dao = UsuarioDAO()
-        usuarios = dao.listarTodosUsuarios()
-        for usuario in usuarios:
-            self.tree.insert("", tk.END, values=usuario)
+        # Preencher a tabela
+        self.atualizar_tabela()
 
         # Posicionando a tabela na janela
         self.tree.pack(expand=True, fill="both")
 
     def atualizar_tabela(self):
-
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -80,7 +73,6 @@ class PaginaDeletarUsuario:
         usuarios = dao.listarTodosUsuarios()
         for usuario in usuarios:
             self.tree.insert("", tk.END, values=usuario)
-
 
     def criar_botoes(self):
         Deletar_button = tk.Button(self.Botao_frame, text="Deletar", command=self.deletar, font=self.fonte,
@@ -94,10 +86,24 @@ class PaginaDeletarUsuario:
 
     def deletar(self):
         id = self.ent_id.get()
+
+        if not id.strip():
+            messagebox.showerror("Erro", "Por favor, insira um ID válido.")
+            return
+
         dao = UsuarioDAO()
-        dao.deletar(id)
-        messagebox.showinfo("Título", "Usuário deletado com sucesso")
-        self.atualizar_tabela()
+        usuario = dao.buscarPorId(id)  # Verificar se o usuário existe
+
+        if not usuario:
+            messagebox.showerror("Erro", "Usuário não encontrado.")
+            return
+
+        # Confirmar a deleção
+        confirmacao = messagebox.askyesno("Confirmar", f"Tem certeza que deseja deletar o usuário ID: {id}?")
+        if confirmacao:
+            dao.deletar(id)
+            messagebox.showinfo("Sucesso", "Usuário deletado com sucesso.")
+            self.atualizar_tabela()
 
     def voltar(self):
         self.tela.destroy()
