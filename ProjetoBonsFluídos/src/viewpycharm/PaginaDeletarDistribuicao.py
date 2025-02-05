@@ -96,24 +96,26 @@ class PaginaInserirDistribuicao:
         Voltar_button.pack(side=tk.LEFT, padx=10)
 
     def deletar(self):
-        id = self.ent_id.get().strip()  # Remove espaços extras
+        id = self.ent_id.get().strip()
 
         if not id.isdigit():
             messagebox.showerror("Erro", "Por favor, insira um ID válido (somente números).")
             return
 
         dao = DistribuicaoDAO()
-        distribuicao = dao.buscarDistribuicaoPorId(id)
+        try:
+            distribuicao = dao.buscarPorId(id)  # Nova função para verificar existência
+            if not distribuicao:
+                messagebox.showerror("Erro", "Distribuição não encontrada!")
+                return
 
-        if not distribuicao:
-            messagebox.showerror("Erro", "Distribuição não encontrada!")
-            return
-
-        confirmacao = messagebox.askyesno("Confirmar", f"Tem certeza que deseja deletar a distribuição ID {id}?")
-        if confirmacao:
-            dao.deletarDistribuicaoPorId(id)
-            self.atualizar_tabela()
-            messagebox.showinfo("Sucesso", "Distribuição deletada com sucesso!")
+            confirmacao = messagebox.askyesno("Confirmar", f"Tem certeza que deseja deletar a distribuição ID {id}?")
+            if confirmacao:
+                dao.deletarDistribuicaoPorId(id)
+                self.atualizar_tabela()
+                messagebox.showinfo("Sucesso", "Distribuição deletada com sucesso!")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao deletar a distribuição: {e}")
 
     def voltar(self):
         self.tela.destroy()

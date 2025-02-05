@@ -134,17 +134,18 @@ class PaginaAlterarUsuario:
         usuario = dao.buscarPorId(user_id)
 
         if usuario:
+            # Preservar os dados originais do usuário
             if categoria == "Nome":
-                # Alterando o nome
                 usuario.nome = alterado
-                dao.atualizar(user_id, usuario)
             elif categoria == "Email":
-                # Alterando o email
                 usuario.email = alterado
+
+            try:
                 dao.atualizar(user_id, usuario)
-            
-            messagebox.showinfo("Sucesso", "Usuário alterado com sucesso!")
-            self.atualizar_tabela()
+                messagebox.showinfo("Sucesso", "Usuário alterado com sucesso!")
+                self.atualizar_tabela()
+            except Exception as e:
+                messagebox.showerror("Erro", str(e))
         else:
             messagebox.showerror("Erro", "Usuário não encontrado.")
 
@@ -154,7 +155,3 @@ class PaginaAlterarUsuario:
             messagebox.showinfo("Saindo", "Voltando para a tela anterior.")
             self.tela.destroy()
 
-# Executar a aplicação
-if __name__ == "__main__":
-    app = PaginaAlterarUsuario()
-    tk.mainloop()

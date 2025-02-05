@@ -21,7 +21,7 @@ class BeneficiarioDAO:
                 result = cursor.fetchone()
 
                 if result:
-                    print("Beneficiário com este CNPJ/CPF já está cadastrado.")
+                    raise Exception("Beneficiário com este CNPJ/CPF já está cadastrado.")
                 else:
                     # Insere o novo beneficiário
                     cursor.execute(sql_insert, (
@@ -33,12 +33,12 @@ class BeneficiarioDAO:
                     if cursor.rowcount > 0:
                         print("Beneficiário cadastrado com sucesso!")
                     else:
-                        print("Beneficiário não cadastrado.")
+                        raise Exception("Beneficiário não cadastrado.")
 
                 cursor.close()
                 conn.close()
         except Exception as e:
-            print(f"Erro ao inserir Beneficiário: {e}")
+            raise e
 
     def atualizar(self, beneficiario):
         sql_update = """
@@ -101,7 +101,7 @@ class BeneficiarioDAO:
                 conn.close()
                 beneficiarios = []
                 for result in results:
-                    beneficiarios.append((result[3], result[1], result[2]))
+                    beneficiarios.append((result[3], result[1], result[2], result[0]))
                 return beneficiarios
         except Exception as e:
             print(f"Erro ao listar Beneficiários: {e}")

@@ -24,33 +24,33 @@ class UsuarioDAO:
                 result_email = cursor.fetchone()
 
                 if result_email:
-                    print("Usuário com este email já está cadastrado.")
+                    raise Exception("Usuário com este email já está cadastrado.")
+
+                # Verifica se há algum usuário com cargo "Administrador"
+                cursor.execute(sql_check_admin)
+                result_admin = cursor.fetchone()
+
+                # Define o cargo como "Administrador" caso não haja nenhum usuário com esse cargo ou a tabela esteja vazia
+                if not result_admin:
+                    usuario.cargo = "Administrador"
+
+                # Insere o novo usuário
+                cursor.execute(sql_insert, (
+                    usuario.nome,
+                    usuario.senha,
+                    usuario.email,
+                    usuario.cargo
+                ))
+                conn.commit()
+                if cursor.rowcount > 0:
+                    print(f"Usuário cadastrado com sucesso! Cargo: {usuario.cargo}")
                 else:
-                    # Verifica se há algum usuário com cargo "Administrador"
-                    cursor.execute(sql_check_admin)
-                    result_admin = cursor.fetchone()
-
-                    # Define o cargo como "ADMIN" caso não haja nenhum usuário com esse cargo ou a tabela esteja vazia
-                    if not result_admin:
-                        usuario.cargo = "Administrador"
-
-                    # Insere o novo usuário
-                    cursor.execute(sql_insert, (
-                        usuario.nome,
-                        usuario.senha,
-                        usuario.email,
-                        usuario.cargo
-                    ))
-                    conn.commit()
-                    if cursor.rowcount > 0:
-                        print(f"Usuário cadastrado com sucesso! Cargo: {usuario.cargo}")
-                    else:
-                        print("Usuário não cadastrado.")
+                    raise Exception("Usuário não cadastrado por algum motivo desconhecido.")
 
                 cursor.close()
                 conn.close()
         except Exception as e:
-            print(f"Erro ao inserir Usuário: {e}")
+            raise e  # Relevanta a exceção para ser tratada no código principal
 
     def buscarPorId(self, usuario_id):
         sql = """
@@ -92,36 +92,43 @@ class UsuarioDAO:
         SET nome = %s, senha = %s, email = %s, cargo = %s
         WHERE usuario_id = %s
         """
+        conn = None
+        cursor = None
         try:
             conn = ConnectionFactory.get_connection()
-            if conn:
-                cursor = conn.cursor()
+            if not conn:
+                raise Exception("Não foi possível estabelecer conexão com o banco de dados")
 
-                # Verifica se o novo email já está sendo usado por outro usuário
-                cursor.execute(sql_check_email, (usuario.email, usuario_id))
-                result_email = cursor.fetchone()
+            cursor = conn.cursor()
+            # Verifica se o novo email já está sendo usado
+            cursor.execute(sql_check_email, (usuario.email, usuario_id))
+            if cursor.fetchone():
+                raise Exception("O email informado já está sendo utilizado por outro usuário.")
 
-                if result_email:
-                    print("O email informado já está sendo utilizado por outro usuário.")
-                else:
-                    # Atualiza o usuário
-                    cursor.execute(sql_update, (
-                        usuario.nome,
-                        usuario.senha,
-                        usuario.email,
-                        usuario.cargo,
-                        usuario_id
-                    ))
-                    conn.commit()
-                    if cursor.rowcount > 0:
-                        print("Usuário atualizado com sucesso!")
-                    else:
-                        print(f"Usuário com ID {usuario_id} não foi atualizado. Verifique os dados.")
+            # Atualiza o usuário
+            cursor.execute(sql_update, (
+                usuario.nome,
+                usuario.senha,
+                usuario.email,
+                usuario.cargo,
+                usuario_id
+            ))
+            conn.commit()
 
-                cursor.close()
-                conn.close()
+            if cursor.rowcount == 0:
+                raise Exception(f"Usuário com ID {usuario_id} não encontrado.")
+
+            return True
+
         except Exception as e:
-            print(f"Erro ao atualizar usuário: {e}")
+            if conn:
+                conn.rollback()
+            raise e
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
     def listarTodosUsuarios(self):
         sql = "SELECT usuario_id, nome, email, cargo FROM usuario"
@@ -134,9 +141,7 @@ class UsuarioDAO:
 
                     usuarios = []
                     for result in resultados:
-                        usuarios.append((result[0], result[1], result[2]))  # Retornando tuplas
-
-                    print(f"Listagem concluída. {len(usuarios)} usuário(s) encontrado(s).")
+                        usuarios.append((result[0], result[1], result[2], result[3]))  # Retornando tuplas
                     return usuarios
         except Exception as e:
             print(f"Erro ao listar usuários: {e}")
@@ -164,32 +169,43 @@ class UsuarioDAO:
             if conn:
                 conn.close()
 
-
     def verificarLogin(self, email, senha):
         sql = """
-        SELECT * FROM usuario WHERE email = %s AND senha = %s
+        SELECT id, nome, tipo_usuario FROM usuario 
+        WHERE email = %s AND senha = %s
         """
         try:
             conn = ConnectionFactory.get_connection()
             if conn:
                 cursor = conn.cursor()
-
                 # Executa a query com os parâmetros
                 cursor.execute(sql, (email, senha))
-
                 # Verifica se encontrou algum usuário
                 result = cursor.fetchone()
-
                 cursor.close()
                 conn.close()
 
                 if result:
+                    # Cria um dicionário com as informações do usuário
+                    usuario = {
+                        "id": result[0],
+                        "nome": result[1],
+                        "tipo": result[2]
+                    }
+
                     print("Login realizado com sucesso!")
-                    return True
+
+                    # Redireciona baseado no tipo de usuário
+                    if usuario["tipo"].upper() == "ADM":
+                        print("Redirecionando para tela de administrador...")
+                        return {"sucesso": True, "tipo": "ADM", "usuario": usuario}
+                    else:
+                        print("Redirecionando para tela de visitante...")
+                        return {"sucesso": True, "tipo": "VISITANTE", "usuario": usuario}
                 else:
                     print("Email ou senha incorretos.")
-                    return False
+                    return {"sucesso": False, "mensagem": "Credenciais inválidas"}
 
         except Exception as e:
             print(f"Erro ao verificar login: {e}")
-            return False
+            return {"sucesso": False, "mensagem": str(e)}

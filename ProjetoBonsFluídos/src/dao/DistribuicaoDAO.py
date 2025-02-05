@@ -173,49 +173,95 @@ class DistribuicaoDAO:
             if conn:
                 conn.close()
 
-    def atualizar(self, distribuicao):
+    def buscarTodasDistribuicoes(self):
+        select_all_distribuicoes_sql = """
+            SELECT
+                d.distribuicao_id AS distribuicao_id,
+                b.nome AS beneficiario_nome,
+                b.email AS beneficiario_email,
+                b.cnpj_cpf AS beneficiario_cnpj_cpf,
+                p.nome AS produto_nome,
+                p.descricao AS produto_descricao,
+                d.data_distribuicao AS data_distribuicao,
+                d.quantidade AS quantidade_distribuida
+            FROM
+                distribuicao d
+            JOIN
+                beneficiario b ON d.beneficiario_id = b.beneficiario_id
+            JOIN
+                produto p ON d.produto_id = p.produto_id;
         """
-        Atualiza uma distribuição no banco de dados.
-        :param distribuicao: Objeto da classe Distribuicao a ser atualizado.
-        """
-        sql_distribuicao = """
-        UPDATE distribuicao
-        SET beneficiario_id = %s, data_distribuicao = %s
-        WHERE distribuicao_id = %s
-        """
-        sql_produtos_distribuicao = """
-        UPDATE distribuicao_produtos
-        SET quantidade = %s
-        WHERE distribuicao_id = %s AND produto_id = %s
-        """
+
         try:
+            # Conectar ao banco de dados
             conn = ConnectionFactory.get_connection()
-            if conn:
-                cursor = conn.cursor()
-
-                # Atualizar a distribuição
-                cursor.execute(sql_distribuicao, (
-                    distribuicao.beneficiario.id,
-                    distribuicao.data_distribuicao,  # corrigido para o nome correto
-                    distribuicao.idDistribuicao
-                ))
-
-                # Atualizar os produtos na distribuição
-                for produto in distribuicao.produtos:
-                    cursor.execute(sql_produtos_distribuicao, (
-                        produto.quantidade,
-                        distribuicao.idDistribuicao,
-                        produto.id
-                    ))
-
-                conn.commit()
-                print("Distribuição atualizada com sucesso!")
-
-                cursor.close()
-                conn.close()
+            with conn.cursor() as cursor:
+                cursor.execute(select_all_distribuicoes_sql)
+                results = cursor.fetchall()
+                return results
 
         except Exception as e:
-            print(f"Erro ao atualizar distribuição: {e}")
+            print(f"Erro ao buscar todas as distribuições: {e}")
+            raise
+
+        finally:
+            if conn:
+                conn.close()
+
+    def deletarDistribuicaoPorId(self, distribuicao_id):
+        if not distribuicao_id:
+            raise ValueError("ID da distribuição é obrigatório.")
+
+        # SQL para buscar os dados da distribuição (produto_id e quantidade)
+        select_distribuicao_sql = """
+            SELECT produto_id, quantidade 
+            FROM distribuicao 
+            WHERE distribuicao_id = %s
+        """
+        # SQL para deletar a distribuição
+        delete_distribuicao_sql = """
+            DELETE FROM distribuicao 
+            WHERE distribuicao_id = %s
+        """
+        # SQL para atualizar o estoque
+        update_produto_sql = """
+            UPDATE produto 
+            SET quantidade = quantidade + %s 
+            WHERE produto_id = %s
+        """
+
+        try:
+            conn = ConnectionFactory.get_connection()
+            with conn.cursor() as cursor:
+                conn.autocommit = False
+
+                # Buscar os dados da distribuição
+                cursor.execute(select_distribuicao_sql, (distribuicao_id,))
+                distribuicao = cursor.fetchone()
+
+                if not distribuicao:
+                    raise ValueError("Distribuição não encontrada com o ID fornecido.")
+
+                produto_id, quantidade = distribuicao
+
+                # Deletar a distribuição
+                cursor.execute(delete_distribuicao_sql, (distribuicao_id,))
+
+                # Atualizar o estoque (devolver a quantidade)
+                cursor.execute(update_produto_sql, (quantidade, produto_id))
+
+                conn.commit()
+                print("Distribuição deletada e estoque restaurado com sucesso!")
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            print(f"Erro ao deletar distribuição: {e}")
+            raise
+
+        finally:
+            if conn:
+                conn.close()
 
     def buscarDistribuicoesPorBeneficiario(self, beneficiario_id):
         select_distribuicoes_sql = """

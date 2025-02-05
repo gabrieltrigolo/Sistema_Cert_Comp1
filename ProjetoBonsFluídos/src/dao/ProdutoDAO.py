@@ -100,31 +100,26 @@ class ProdutoDAO:
 
     def listarTodosProdutos(self) -> List[Produto]:
         """
-        Retorna todos os produtos da tabela 'produto'.
+        Retorna todos os produtos da tabela 'produto' com quantidade > 0.
         :return: Lista de objetos Produto.
         """
         sql = """
         SELECT produto_id, nome, descricao, quantidade, data_doacao
         FROM produto
+        WHERE quantidade > 0  -- Filtra produtos com quantidade maior que zero
         """
         try:
             conn = ConnectionFactory.get_connection()
             if conn:
                 cursor = conn.cursor()
                 cursor.execute(sql)
-                rows = cursor.fetchall()
+                results = cursor.fetchall()
                 cursor.close()
                 conn.close()
-                return [
-                    Produto(
-                        idProduto=row[0],
-                        nome=row[1],
-                        descricao=row[2],
-                        quantidade=row[3],
-                        dataRecebimento=row[4]
-                    )
-                    for row in rows
-                ]
+                produtos = []
+                for result in results:
+                    produtos.append((result[1], result[2], result[3], result[4]))
+                return produtos
         except Exception as e:
             print(f"Erro ao listar produtos: {e}")
             return []

@@ -95,9 +95,7 @@ class PaginaInserirDoacoes:
             dao.inserir(doacao)
 
             # Mensagem de sucesso
-            messagebox.showinfo("Sucesso", f"Doação inserida com sucesso!\nProduto: {nome}\nQuantidade: {quantidade}")
-            print(f"Nome: {nome}, Data: {data}, Quantidade: {quantidade}")
-        
+            messagebox.showinfo("Sucesso", f"Doação inserida com sucesso!\nProduto: {nome}\nQuantidade: {quantidade}\nDoador: {doador}")
         except Exception as e:
             # Exibindo mensagem de erro caso ocorra algum problema
             messagebox.showerror("Erro", f"Erro ao inserir a doação: {str(e)}")

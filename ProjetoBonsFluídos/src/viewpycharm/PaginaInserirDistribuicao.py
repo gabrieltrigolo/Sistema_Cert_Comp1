@@ -48,6 +48,8 @@ class PaginaInserirDistribuicao:
 
         # Criando botões
         self.criar_botoes()
+        self.atualizar_tabela()
+
 
     def criar_rotulos(self):
         tk.Label(self.Campos_frame, text="Quantidade:", font=self.fonte, **self.conf_Label).grid(row=0, column=0)
@@ -98,7 +100,6 @@ class PaginaInserirDistribuicao:
             self.tree_produtos.heading(col, text=col)
             self.tree_produtos.column(col, width=100)
 
-        self.atualizar_tabela()
 
     def criar_tabela_beneficiarios(self):
         container = tk.Frame(self.Tabela2_frame)
@@ -121,7 +122,6 @@ class PaginaInserirDistribuicao:
             self.tree_beneficiarios.heading(col, text=col)
             self.tree_beneficiarios.column(col, width=100)
 
-        self.atualizar_tabela()
 
     def atualizar_tabela(self):
         for item in self.tree_produtos.get_children():

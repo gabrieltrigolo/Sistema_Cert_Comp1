@@ -58,7 +58,7 @@ class PaginaAlterarPermissoes:
         self.Permissao_combobox.grid(row=1, column=1, padx=5, pady=5)
 
     def criar_tabela(self):
-        columns = ("ID", "Nome", "Email")
+        columns = ("ID", "Nome", "Email", "Cargo")
         self.tree = ttk.Treeview(self.Tabela_frame, columns=columns, show="headings")
 
         # Definindo os títulos das colunas
@@ -69,6 +69,7 @@ class PaginaAlterarPermissoes:
         self.tree.column("ID", width=50)
         self.tree.column("Nome", width=150)
         self.tree.column("Email", width=200)
+        self.tree.column("Email", width=150)
 
         for item in self.tree.get_children():
             self.tree.delete(item)

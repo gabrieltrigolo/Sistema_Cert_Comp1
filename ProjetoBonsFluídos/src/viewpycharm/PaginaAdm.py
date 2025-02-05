@@ -50,7 +50,6 @@ class PaginaADM:
 			botao.pack(pady=20 if i % 2 == 0 else 0)
 
 	def Tela_usuarios(self):
-		print("entrou Tela_Usuarios")
 		tela_usuario = PaginaUsuario()
 		tela_usuario.tela.mainloop()
 
