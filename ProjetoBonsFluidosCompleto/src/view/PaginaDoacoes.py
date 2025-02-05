@@ -63,7 +63,7 @@ class PaginaDoacoes:
         for doacao in doacoes:
             campos_filtrados = (
                 doacao[0],  # Doação ID
-                doacao[6],  # Produto ID
+                doacao[5],  # Produto ID
                 doacao[4],  # Doador
                 doacao[3],  # Quantidade
                 doacao[2]   # Data da Doação
