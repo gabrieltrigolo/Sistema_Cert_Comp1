@@ -38,12 +38,12 @@ class PaginaLogin:
         self.tela.geometry("700x500")
 
         # Criando Frames
-        self.Nome_frame = tk.Frame(self.tela)
+        self.Email_frame = tk.Frame(self.tela)
         self.Senha_frame = tk.Frame(self.tela)
         self.Botao_frame = tk.Frame(self.tela)
 
         # Colocando frames à tela
-        self.Nome_frame.pack(pady=50)
+        self.Email_frame.pack(pady=50)
         self.Senha_frame.pack()
         self.Botao_frame.pack(pady=24)
 
@@ -57,17 +57,17 @@ class PaginaLogin:
         self.criar_botoes()
 
     def criar_rotulos(self):
-        Nome_label = tk.Label(self.Nome_frame, text="Nome: ", font=self.fonte, **self.conf_Label)
+        Email_label = tk.Label(self.Email_frame, text="Email: ", font=self.fonte, **self.conf_Label)
         Senha_label = tk.Label(self.Senha_frame, text="Senha: ", font=self.fonte, **self.conf_Label)
 
-        Nome_label.pack()
+        Email_label.pack()
         Senha_label.pack()
 
     def criar_entries(self):
-        self.Nome_entry = tk.Entry(self.Nome_frame, font=self.fonte, **self.conf_Entry)
+        self.Email_entry = tk.Entry(self.Email_frame, font=self.fonte, **self.conf_Entry)
         self.Senha_entry = tk.Entry(self.Senha_frame, show="*", font=self.fonte, **self.conf_Entry)
 
-        self.Nome_entry.pack()
+        self.Email_entry.pack()
         self.Senha_entry.pack()
 
     def criar_botoes(self):
@@ -78,7 +78,7 @@ class PaginaLogin:
         Cadastrar_button.pack(pady=12)
 
     def entrar(self):
-        email = self.Nome_entry.get()  # Assumindo que Nome_entry é para o email
+        email = self.Email_entry.get()
         senha = self.Senha_entry.get()
 
         try:
