@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
-
+from tkinter import ttk, messagebox
 from src.dao.UsuarioDAO import UsuarioDAO
 
 
@@ -104,7 +103,6 @@ class PaginaAlterarPermissoes:
         Voltar_button.pack(side=tk.LEFT, padx=10)
 
     def atualizar_tabela(self):
-
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -117,25 +115,26 @@ class PaginaAlterarPermissoes:
         permissao = self.Permissao_combobox.get()
         id_usuario = self.ent_id.get()
 
+        # Verifica se o ID foi preenchido
+        if not id_usuario.strip():
+            messagebox.showerror("Erro", "Por favor, insira um ID válido.")
+            return
+
         dao = UsuarioDAO()
-        # Teste do metodo buscarPorId
-        user_id = self.ent_id.get()  # Substitua pelo ID gerado ao inserir
-        usuario = dao.buscarPorId(user_id)
+        usuario = dao.buscarPorId(id_usuario)
 
-        # Verificar se o usuário existe
         if usuario:
-            # Alterando o nome
             usuario.cargo = permissao
-            dao.atualizar(user_id, usuario)
+            dao.atualizar(id_usuario, usuario)
             self.atualizar_tabela()
+            messagebox.showinfo("Sucesso", f"Permissão do usuário {usuario.nome} alterada para {permissao}!")
         else:
-            print("Usuário não encontrado.")
-
-        print(f"{permissao} {id_usuario} Alterar")
+            messagebox.showerror("Erro", "Usuário não encontrado.")
 
     def voltar(self):
-        print("Voltar")
-        self.tela.destroy()
+        confirmacao = messagebox.askyesno("Confirmar", "Tem certeza que deseja voltar?")
+        if confirmacao:
+            self.tela.destroy()
 
 
 # Executar a aplicação
