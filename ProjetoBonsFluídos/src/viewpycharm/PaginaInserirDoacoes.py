@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
 from datetime import date
 from src.dao.DoacaoDAO import DoacaoDAO
@@ -73,24 +73,36 @@ class PaginaInserirDoacoes:
         Voltar_button.pack(side=tk.LEFT, padx=10)
 
     def inserir_dados(self):
-        data = date.today()
         nome = self.ent_nome.get()
-        quantidade = self.ent_quantidade.get()
         descricao = self.ent_desc.get()
+        quantidade = self.ent_quantidade.get()
         doador = self.ent_doador.get()
+        data = date.today()
 
-        produto = Produto(None, nome, descricao, quantidade, data)
-        dao = DoacaoDAO()
-        doacao = Doacao(idDoacao=None, produto=produto,
-                         dataDoacao=data,
-                         quantidade=quantidade,
-                         responsavel=doador)
-        dao.inserir(doacao)
-        print(f"Nome: {nome}, Data: {data}, Quantidade: {quantidade}")
+        # Verificando se todos os campos foram preenchidos
+        if not nome or not descricao or not quantidade or not doador:
+            messagebox.showerror("Erro", "Por favor, preencha todos os campos obrigatórios.")
+            return
 
+        try:
+            # Criando o produto e a doação
+            produto = Produto(None, nome, descricao, quantidade, data)
+            dao = DoacaoDAO()
+            doacao = Doacao(idDoacao=None, produto=produto,
+                             dataDoacao=data,
+                             quantidade=quantidade,
+                             responsavel=doador)
+            dao.inserir(doacao)
+
+            # Mensagem de sucesso
+            messagebox.showinfo("Sucesso", f"Doação inserida com sucesso!\nProduto: {nome}\nQuantidade: {quantidade}")
+            print(f"Nome: {nome}, Data: {data}, Quantidade: {quantidade}")
+        
+        except Exception as e:
+            # Exibindo mensagem de erro caso ocorra algum problema
+            messagebox.showerror("Erro", f"Erro ao inserir a doação: {str(e)}")
 
     def voltar_para_menu_principal(self):
-        print("Voltar")
         self.tela.destroy()
 
 # Executar a aplicação
