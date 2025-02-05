@@ -55,20 +55,20 @@ class PaginaADM:
 			botao.pack(pady=20 if i % 2 == 0 else 0)
 
 	def Tela_usuarios(self):
-		tela_usuario = PaginaUsuario()
-		tela_usuario.tela.mainloop()
+		self.tela.withdraw()  # Oculta a tela ADM
+		self.tela_inserirusuario = PaginaUsuario(self.tela)
 
 	def Tela_beneficiarios(self):
-		tela_beneficiario = PaginaBeneficiario()
-		tela_beneficiario.tela.mainloop()
+		self.tela.withdraw()  # Oculta a tela ADM
+		self.tela_beneficiario = PaginaBeneficiario(self.tela)
 
 	def Tela_doacoes(self):
-		tela_doacoes = PaginaDoacoes()
-		tela_doacoes.tela.mainloop()
+		self.tela.withdraw()  # Oculta a tela ADM
+		self.tela_doacoes = PaginaDoacoes(self.tela)
 
 	def Tela_distribuicao(self):
-		tela_distribuicao = PaginaDistribuicao()
-		tela_distribuicao.tela.mainloop()
+		self.tela.withdraw()  # Oculta a tela ADM
+		self.tela_distribuicao = PaginaDistribuicao(self.tela)
 
 	def Tela_relatorios(self):
 		nova_janela = tk.Toplevel()  # Cria uma nova janela em vez de uma nova instância do Tk

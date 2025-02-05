@@ -4,14 +4,15 @@ from tkinter import ttk, messagebox
 
 from src.dao.DoacaoDAO import DoacaoDAO  # Atualizar para o DAO correto
 from src.view.PaginaDeletarDoacao import PaginaDeletarDoacao
-from src.view.PaginaInserirDoacoes import PaginaInserirDoacoes  # Atualizar para a página correta
+from src.view.PaginaInserirDoacoes import PaginaInserirDoacoes  #Atualizar para a página correta
 
 class PaginaDoacoes:
-    def __init__(self):
+    def __init__(self, master):
         # Configurações iniciais
         self.fonte = ("Arial", 12)
 
         # Criando a janela principal
+        self.master = master
         self.tela = tk.Tk()
         self.tela.title("Gerenciar Doações")
         self.tela.geometry("900x400")
@@ -100,5 +101,6 @@ class PaginaDoacoes:
 
     def Voltar(self):
         self.tela.destroy()
+        self.master.deiconify()  # Reexibe a tela ADM
 
 

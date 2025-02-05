@@ -8,11 +8,12 @@ from src.view.PaginaAlterarUsuario import PaginaAlterarUsuario
 from src.view.PaginaAlterarPermissoes import PaginaAlterarPermissoes
 
 class PaginaUsuario:
-    def __init__(self):
+    def __init__(self, master):
         # Configurações iniciais
         self.fonte = ("Arial", 12)
 
         # Criando a janela principal
+        self.master = master
         self.tela = tk.Tk()
         self.tela.title("Usuário")
         self.tela.geometry("700x500")
@@ -83,8 +84,8 @@ class PaginaUsuario:
 
     # Mantidos os métodos originais
     def Inserir_usuario(self):
-        tela_inserirusuario = PaginaInserirUsuario()
-        tela_inserirusuario.tela.mainloop()
+        self.tela.withdraw()  # Oculta a tela de login
+        self.tela_inserirusuario = PaginaInserirUsuario(self.tela)
 
     def Deletar_usuario(self):
         tela_deletarusuario = PaginaDeletarUsuario()
@@ -100,3 +101,4 @@ class PaginaUsuario:
 
     def Voltar(self):
         self.tela.destroy()
+        self.master.deiconify()  # Reexibe a tela ADM

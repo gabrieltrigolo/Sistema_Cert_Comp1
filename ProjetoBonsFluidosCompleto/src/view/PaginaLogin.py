@@ -86,6 +86,7 @@ class PaginaLogin:
             resultado = usuario_dao.verificarLogin(email, senha)
 
             if resultado["sucesso"]:
+                self.tela.destroy()
                 if resultado["tipo"] == "Administrador":
                     tela_adm = PaginaADM()
                     tela_adm.tela.mainloop()
@@ -97,10 +98,12 @@ class PaginaLogin:
         except Exception as e:
             messagebox.showerror("Erro", f"Ocorreu um erro: {str(e)}")
 
+
     def cadastrar(self):
         from src.view.PaginaInserirUsuario import PaginaInserirUsuario  # Importação aqui para evitar problemas de referência circular
-        tela_inserirusuario = PaginaInserirUsuario()
-        tela_inserirusuario.tela.mainloop()
+        self.tela.withdraw()  # Oculta a tela de login
+        self.tela_inserirusuario = PaginaInserirUsuario(self.tela)
+
 
 
 # Executar a aplicação

@@ -11,7 +11,7 @@ class ConnectionFactory:
             connection = mysql.connector.connect(
                 host='localhost',
                 user='root',
-                password='123456',
+                password='utfpr',
                 database='testeprojeto',
             )
             if connection.is_connected():

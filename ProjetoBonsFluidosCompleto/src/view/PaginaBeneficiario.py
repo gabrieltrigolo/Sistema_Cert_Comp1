@@ -8,11 +8,12 @@ from src.view.PaginaInserirBeneficiario import PaginaInserirBeneficiario
 
 
 class PaginaBeneficiario:
-    def __init__(self):
+    def __init__(self, master):
         # Configurações iniciais
         self.fonte = ("Arial", 12)
 
         # Criando a janela principal
+        self.master = master
         self.tela = tk.Tk()
         self.tela.title("Beneficiário")
         self.tela.geometry("700x500")
@@ -99,4 +100,5 @@ class PaginaBeneficiario:
 
     def Voltar(self):
         self.tela.destroy()
+        self.master.deiconify()  # Reexibe a tela ADM
 

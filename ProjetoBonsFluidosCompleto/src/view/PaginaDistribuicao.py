@@ -8,11 +8,12 @@ from src.view.PaginaDeletarDistribuicao import PaginaDeletarDistribuicao
 
 
 class PaginaDistribuicao:
-    def __init__(self):
+    def __init__(self, master):
         # Configurações iniciais
         self.fonte = ("Arial", 12)
 
         # Criando a janela principal
+        self.master = master
         self.tela = tk.Tk()
         self.tela.title("Beneficiário")
         self.tela.geometry("700x400")
@@ -101,5 +102,6 @@ class PaginaDistribuicao:
 
     def Voltar(self):
         self.tela.destroy()
+        self.master.deiconify()  # Reexibe a tela ADM
 
 

@@ -4,7 +4,7 @@ from src.dao.UsuarioDAO import UsuarioDAO
 from src.model.Usuario import Usuario
 
 class PaginaInserirUsuario:
-    def __init__(self):
+    def __init__(self, master):
         # Configurações iniciais
         self.fonte = ("Arial", 12)
         self.conf_Label = {
@@ -24,6 +24,7 @@ class PaginaInserirUsuario:
         }
 
         # Criando Tela
+        self.master = master  # Referência à janela principal
         self.tela = tk.Toplevel()
         self.tela.title("Inserir Usuário")
         self.tela.geometry("700x500")
@@ -118,5 +119,6 @@ class PaginaInserirUsuario:
             messagebox.showerror("Erro", f"Falha ao inserir o usuário: {str(e)}")
 
     def voltar(self):
-        self.tela.destroy()
+        self.tela.destroy()  # Fecha a tela de cadastro
+        self.master.deiconify()  # Reexibe a tela de login
 
