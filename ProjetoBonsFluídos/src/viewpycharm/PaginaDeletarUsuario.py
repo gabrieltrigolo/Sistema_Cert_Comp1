@@ -107,8 +107,3 @@ class PaginaDeletarUsuario:
 
     def voltar(self):
         self.tela.destroy()
-
-# Executar a aplicação
-if __name__ == "__main__":
-    app = PaginaDeletarUsuario()
-    tk.mainloop()

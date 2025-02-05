@@ -52,7 +52,3 @@ class PaginaDados:
         print("voltouuu")
 
 
-# Executar a aplicação
-if __name__ == "__main__":
-    app = PaginaDados()
-    tk.mainloop()

@@ -1,88 +1,102 @@
-#Importando biblioteca Tkinter 
 import tkinter as tk
 from tkinter import messagebox
-
-from PaginaAdm import PaginaADM
-from PaginaInserirUsuario import PaginaInserirUsuario
 from src.dao.UsuarioDAO import UsuarioDAO
+from src.view.PaginaAdm import PaginaADM
+from src.view.PaginaRelatorio import PaginaRelatorio
 
-#Criando dicionário de fontes e configs
-fonte = {
-	("Arial", 12)
-}
-conf_Label = {
-	"width":20,
-	"height":2,
-	"padx":10,
-	"pady":10
-}
-conf_Entry = {
-	"width":40
-}
-conf_Button = {
-	"width":5,
-	"height":1,
-	"padx":10,
-	"pady":5
-}
 
-#Função quando botão for pressionado
-def entrar():
-	email = Nome_entry.get()  # Assumindo que Nome_entry é para o email
-	senha = Senha_entry.get()
+class PaginaLogin:
+    def __init__(self):
+        # Configurações iniciais
+        self.fonte = ("Arial", 12)
+        self.conf_Label = {
+            "width": 20,
+            "height": 2,
+            "padx": 10,
+            "pady": 10
+        }
+        self.conf_Entry = {
+            "width": 40
+        }
+        self.conf_Button = {
+            "width": 5,
+            "height": 1,
+            "padx": 10,
+            "pady": 5
+        }
 
-	try:
-		usuario_dao = UsuarioDAO()
-		resultado = usuario_dao.verificarLogin(email, senha)
+        # Criando Tela
+        self.tela = tk.Tk()
+        self.tela.title("Login")
+        self.tela.geometry("700x500")
 
-		if resultado["sucesso"]:
-			if resultado["tipo"] == "Administrador":
-				tela_adm = PaginaADM()
-				tela_adm.tela.mainloop()
-			else:
-				print("oi")
-				# tela_visit = PaginaVisitante()  # Classe correta para visitantes
-				# tela_visit.tela.mainloop()
-		else:
-			messagebox.showerror("Erro de Login", "Email ou senha incorretos!")
-	except Exception as e:
-		messagebox.showerror("Erro", f"Ocorreu um erro: {str(e)}")
+        # Criando Frames
+        self.Nome_frame = tk.Frame(self.tela)
+        self.Senha_frame = tk.Frame(self.tela)
+        self.Botao_frame = tk.Frame(self.tela)
 
-def cadastrar():
-	tela_inserirusuario = PaginaInserirUsuario()
-	tela_inserirusuario.tela.mainloop()
+        # Colocando frames à tela
+        self.Nome_frame.pack(pady=50)
+        self.Senha_frame.pack()
+        self.Botao_frame.pack(pady=24)
 
-#Criando Tela
-tela = tk.Tk()
+        # Criando rótulos (Labels)
+        self.criar_rotulos()
 
-tela.title("Login")
-tela.geometry("700x500")
+        # Criando entradas de texto (Entry)
+        self.criar_entries()
 
-#Criando Frames
-Nome_frame = tk.Frame(tela)
-Senha_frame = tk.Frame(tela)
-Botao_frame = tk.Frame(tela)
+        # Criando botões (Button)
+        self.criar_botoes()
 
-#Colocando frames à tela
-Nome_frame.pack(pady=50)
-Senha_frame.pack()
-Botao_frame.pack(pady=24)
+    def criar_rotulos(self):
+        Nome_label = tk.Label(self.Nome_frame, text="Nome: ", font=self.fonte, **self.conf_Label)
+        Senha_label = tk.Label(self.Senha_frame, text="Senha: ", font=self.fonte, **self.conf_Label)
 
-#Criando rótulos (Labels)
-Nome_label = tk.Label(Nome_frame, text="Nome: ", font=fonte, **conf_Label)
-Senha_label = tk.Label(Senha_frame, text="Senha: ", font=fonte, **conf_Label)
-#Criando entrada de texto (Entry)
-Nome_entry = tk.Entry(Nome_frame, font=fonte, **conf_Entry)
-Senha_entry = tk.Entry(Senha_frame, show="*", font=fonte, **conf_Entry)
-#Criando botão (Button)
-Entrar_button = tk.Button(Botao_frame, text="Entrar", command=entrar, font=fonte)
-Cadastrar_button = tk.Button(Botao_frame, text="Cadastrar", command=cadastrar, font=fonte)
-#Colocando elementos à tela
-Nome_label.pack()
-Nome_entry.pack()
-Senha_label.pack()
-Senha_entry.pack()
-Entrar_button.pack(pady=12)
-Cadastrar_button.pack(pady=12)
+        Nome_label.pack()
+        Senha_label.pack()
 
-tela.mainloop()
+    def criar_entries(self):
+        self.Nome_entry = tk.Entry(self.Nome_frame, font=self.fonte, **self.conf_Entry)
+        self.Senha_entry = tk.Entry(self.Senha_frame, show="*", font=self.fonte, **self.conf_Entry)
+
+        self.Nome_entry.pack()
+        self.Senha_entry.pack()
+
+    def criar_botoes(self):
+        Entrar_button = tk.Button(self.Botao_frame, text="Entrar", command=self.entrar, font=self.fonte)
+        Cadastrar_button = tk.Button(self.Botao_frame, text="Cadastrar", command=self.cadastrar, font=self.fonte)
+
+        Entrar_button.pack(pady=12)
+        Cadastrar_button.pack(pady=12)
+
+    def entrar(self):
+        email = self.Nome_entry.get()  # Assumindo que Nome_entry é para o email
+        senha = self.Senha_entry.get()
+
+        try:
+            usuario_dao = UsuarioDAO()
+            resultado = usuario_dao.verificarLogin(email, senha)
+
+            if resultado["sucesso"]:
+                if resultado["tipo"] == "Administrador":
+                    tela_adm = PaginaADM()
+                    tela_adm.tela.mainloop()
+                else:
+                    nova_janela = tk.Toplevel()  # Cria uma nova janela em vez de uma nova instância do Tk
+                    tela_relatorio = PaginaRelatorio(nova_janela)  # Passa a nova janela como root
+            else:
+                messagebox.showerror("Erro de Login", "Email ou senha incorretos!")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Ocorreu um erro: {str(e)}")
+
+    def cadastrar(self):
+        from src.view.PaginaInserirUsuario import PaginaInserirUsuario  # Importação aqui para evitar problemas de referência circular
+        tela_inserirusuario = PaginaInserirUsuario()
+        tela_inserirusuario.tela.mainloop()
+
+
+# Executar a aplicação
+if __name__ == "__main__":
+    app = PaginaLogin()
+    app.tela.mainloop()

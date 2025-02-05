@@ -103,7 +103,4 @@ class PaginaDoacoes:
     def Voltar(self):
         self.tela.destroy()
 
-# Executar a aplicação
-if __name__ == "__main__":
-    app = PaginaDoacoes()
-    tk.mainloop()
+

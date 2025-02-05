@@ -167,8 +167,3 @@ class PaginaInserirDistribuicao:
 
     def voltar(self):
         self.tela.destroy()
-
-
-if __name__ == "__main__":
-    app = PaginaInserirDistribuicao()
-    tk.mainloop()

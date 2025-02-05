@@ -110,8 +110,3 @@ class PaginaDeletarBeneficiario:
             messagebox.showinfo("Sucesso", "Saindo do programa.")
             self.tela.destroy()
 
-
-# Executar a aplicação
-if __name__ == "__main__":
-    app = PaginaDeletarBeneficiario()
-    tk.mainloop()

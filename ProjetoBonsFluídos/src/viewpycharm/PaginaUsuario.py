@@ -101,7 +101,3 @@ class PaginaUsuario:
 
     def Voltar(self):
         self.tela.destroy()
-
-if __name__ == "__main__":
-    app = PaginaUsuario()
-    tk.mainloop()

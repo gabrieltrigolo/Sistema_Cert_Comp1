@@ -5,6 +5,7 @@ from src.view.PaginaBeneficiario import PaginaBeneficiario
 from src.view.PaginaDistribuicao import PaginaDistribuicao
 from src.view.PaginaDoacoes import PaginaDoacoes
 from src.view.PaginaInserirDoacoes import PaginaInserirDoacoes
+from src.view.PaginaRelatorio import PaginaRelatorio
 from src.view.PaginaUsuario import PaginaUsuario
 
 
@@ -70,12 +71,9 @@ class PaginaADM:
 		tela_distribuicao.tela.mainloop()
 
 	def Tela_relatorios(self):
-		print("entrou Tela_relatorios")
+		nova_janela = tk.Toplevel()  # Cria uma nova janela em vez de uma nova instância do Tk
+		tela_relatorio = PaginaRelatorio(nova_janela)  # Passa a nova janela como root
 
 	def Tela_sair(self):
 		self.tela.destroy()
 
-# Executar a aplicação
-if __name__ == "__main__":
-    app = PaginaADM()
-    tk.mainloop()

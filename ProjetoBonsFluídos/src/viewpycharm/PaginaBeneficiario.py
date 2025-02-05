@@ -99,6 +99,3 @@ class PaginaBeneficiario:
     def Voltar(self):
         self.tela.destroy()
 
-if __name__ == "__main__":
-    app = PaginaBeneficiario()
-    app.tela.mainloop()
