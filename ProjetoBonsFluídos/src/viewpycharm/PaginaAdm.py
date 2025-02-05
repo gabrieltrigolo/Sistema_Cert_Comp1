@@ -3,6 +3,7 @@ import tkinter as tk
 
 from src.view.PaginaBeneficiario import PaginaBeneficiario
 from src.view.PaginaDistribuicao import PaginaDistribuicao
+from src.view.PaginaDoacoes import PaginaDoacoes
 from src.view.PaginaInserirDoacoes import PaginaInserirDoacoes
 from src.view.PaginaUsuario import PaginaUsuario
 
@@ -61,7 +62,7 @@ class PaginaADM:
 		tela_beneficiario.tela.mainloop()
 
 	def Tela_doacoes(self):
-		tela_doacoes = PaginaInserirDoacoes()
+		tela_doacoes = PaginaDoacoes()
 		tela_doacoes.tela.mainloop()
 
 	def Tela_distribuicao(self):

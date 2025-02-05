@@ -2,27 +2,28 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from src.dao.DistribuicaoDAO import DistribuicaoDAO
-from src.view.PaginaInserirDistribuicao import PaginaInserirDistribuicao
-from src.view.PaginaDeletarDistribuicao import PaginaDeletarDistribuicao
+from src.dao.DoacaoDAO import DoacaoDAO  # Atualizar para o DAO correto
+from src.view.PaginaDeletarDoacao import PaginaDeletarDoacao
+from src.view.PaginaInserirDoacoes import PaginaInserirDoacoes  # Atualizar para a página correta
+# from src.view.PaginaDeletarDoacao import PaginaDeletarDoacao  # Atualizar para a página correta
 
 
-class PaginaDistribuicao:
+class PaginaDoacoes:
     def __init__(self):
         # Configurações iniciais
         self.fonte = ("Arial", 12)
 
         # Criando a janela principal
         self.tela = tk.Tk()
-        self.tela.title("Beneficiário")
-        self.tela.geometry("700x400")
+        self.tela.title("Gerenciar Doações")
+        self.tela.geometry("900x400")
 
         # Criando Frame para a tabela
         self.Tabela_frame = tk.Frame(self.tela)
         self.Tabela_frame.pack(pady=10)
 
         # Adicionando título para a tabela
-        self.titulo_tabela = tk.Label(self.Tabela_frame, text="Tabela de Distribuições", font=("Arial", 14))
+        self.titulo_tabela = tk.Label(self.Tabela_frame, text="Tabela de Doações", font=("Arial", 14))
         self.titulo_tabela.pack(pady=5)
 
         # Criando a tabela
@@ -36,7 +37,7 @@ class PaginaDistribuicao:
         self.criar_botoes()
 
     def criar_tabela(self):
-        columns = ("Distribuição ID", "Nome Beneficiario", "Quantidade", "Data")
+        columns = ("Doação ID", "Nome do Produto", "Doador", "Quantidade", "Data da Doação")
         self.tree = ttk.Treeview(self.Tabela_frame, columns=columns, show="headings")
 
         # Definindo os títulos das colunas
@@ -44,10 +45,11 @@ class PaginaDistribuicao:
             self.tree.heading(col, text=col)
 
         # Definindo o tamanho das colunas
-        self.tree.column("Distribuição ID", width=150)
-        self.tree.column("Nome Beneficiario", width=200)
-        self.tree.column("Quantidade", width=200)
-        self.tree.column("Data", width=200)
+        self.tree.column("Doação ID", width=150)
+        self.tree.column("Nome do Produto", width=150)
+        self.tree.column("Doador", width=200)
+        self.tree.column("Quantidade", width=150)
+        self.tree.column("Data da Doação", width=150)
 
         self.atualizar_tabela()
 
@@ -58,22 +60,23 @@ class PaginaDistribuicao:
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        dao = DistribuicaoDAO()
-        distribuicoes = dao.buscarTodasDistribuicoes()
-        for distribuicao in distribuicoes:
+        dao = DoacaoDAO()  # Usar o DAO correto para buscar doações
+        doacoes = dao.listarTodasDoacoes()
+        for doacao in doacoes:
             campos_filtrados = (
-                distribuicao[0],  # Distribuição ID
-                distribuicao[1],  # Beneficiario NOME
-                distribuicao[7],  # Quantidade
-                distribuicao[6]  # Data
+                doacao[0],  # Doação ID
+                doacao[6],  # Produto ID
+                doacao[4],  # Doador
+                doacao[3],  # Quantidade
+                doacao[2]   # Data da Doação
             )
             self.tree.insert("", tk.END, values=campos_filtrados)
 
     def criar_botoes(self):
         # Lista de tuplas com (texto, comando)
         botoes = [
-            ("Inserir Distribuição", self.Inserir_distribuicao),
-            ("Deletar Distribuição", self.Deletar_distribuicao),
+            ("Inserir Doação", self.Inserir_doacao),
+            ("Deletar Doação", self.Deletar_doacao),
             ("Voltar", self.Voltar)
         ]
 
@@ -89,21 +92,18 @@ class PaginaDistribuicao:
             )
             botao.pack(side=tk.LEFT, padx=10)  # Posiciona os botões lado a lado
 
-    def Inserir_distribuicao(self):
-        print("entrou Inserir Usuários")
-        tela_inserirdistribuicao = PaginaInserirDistribuicao()
-        tela_inserirdistribuicao.tela.mainloop()
+    def Inserir_doacao(self):
+        tela_inserir_doacao = PaginaInserirDoacoes()  # Atualizar para a página correta de inserção de doações
+        tela_inserir_doacao.tela.mainloop()
 
-    def Deletar_distribuicao(self):
-        print("entrou Inserir Usuários")
-        tela_deletardistribuicao = PaginaDeletarDistribuicao()
-        tela_deletardistribuicao.tela.mainloop()
+    def Deletar_doacao(self):
+        tela_deletar_doacao = PaginaDeletarDoacao()  # Atualizar para a página correta de deleção de doações
+        tela_deletar_doacao.tela.mainloop()
 
     def Voltar(self):
-        print("voltou")
-
+        self.tela.destroy()
 
 # Executar a aplicação
 if __name__ == "__main__":
-    app = PaginaDistribuicao()
+    app = PaginaDoacoes()
     tk.mainloop()

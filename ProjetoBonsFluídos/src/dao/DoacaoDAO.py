@@ -148,3 +148,99 @@ class DoacaoDAO:
         finally:
             if conn:
                 conn.close()
+
+
+    def listarTodasDoacoes(self):
+        # Consulta SQL para buscar todas as doações
+        query_buscar_doacoes = """
+                SELECT d.doacao_id, d.produto_id, d.data_doacao, d.quantidade, d.doador,
+                       p.nome AS produto_nome, p.descricao AS produto_descricao, p.quantidade AS produto_quantidade
+                FROM doacao d
+                JOIN produto p ON d.produto_id = p.produto_id
+            """
+
+        try:
+            # Conectar ao banco de dados
+            conn = ConnectionFactory.get_connection()
+            with conn.cursor() as cursor:
+                cursor.execute(query_buscar_doacoes)
+                doacoes = cursor.fetchall()  # Busca todas as doações
+
+                # Formatar os resultados em uma lista de dicionários
+                lista_doacoes = []
+                for doacao in doacoes:
+                    lista_doacoes.append((
+                        doacao[0],
+                        doacao[1],
+                        doacao[2],
+                        doacao[3],
+                        doacao[4],
+                        doacao[5],
+                        doacao[6],
+                        doacao[7]
+                    ))
+
+                return lista_doacoes  # Retorna a lista de doações
+
+        except Exception as e:
+            print(f"Erro ao buscar doações: {e}")
+            raise
+        finally:
+            if conn:
+                conn.close()
+
+    def deletarDoacaoPorId(self, doacao_id):
+        if not doacao_id:
+            raise ValueError("ID da doação é obrigatório.")
+
+        # SQL para buscar os dados da doação (produto_id e quantidade)
+        select_doacao_sql = """
+            SELECT produto_id, quantidade 
+            FROM doacao 
+            WHERE doacao_id = %s
+        """
+
+        # SQL para deletar a doação
+        delete_doacao_sql = """
+            DELETE FROM doacao 
+            WHERE doacao_id = %s
+        """
+
+        # SQL para deletar o produto
+        delete_produto_sql = """
+            DELETE FROM produto 
+            WHERE produto_id = %s
+        """
+
+        try:
+            conn = ConnectionFactory.get_connection()
+            with conn.cursor() as cursor:
+                conn.autocommit = False
+
+                # Buscar os dados da doação
+                cursor.execute(select_doacao_sql, (doacao_id,))
+                doacao = cursor.fetchone()
+
+                if not doacao:
+                    raise ValueError("Doação não encontrada com o ID fornecido.")
+
+                produto_id, quantidade = doacao
+
+                # Deletar a doação
+                cursor.execute(delete_doacao_sql, (doacao_id,))
+
+                # Deletar o produto
+                cursor.execute(delete_produto_sql, (produto_id,))
+
+                conn.commit()
+                print("Doação e produto deletados com sucesso!")
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            print(f"Erro ao deletar doação: {e}")
+            raise
+
+        finally:
+            if conn:
+                conn.close()
