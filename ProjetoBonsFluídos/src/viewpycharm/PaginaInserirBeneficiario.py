@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from src.dao.BeneficiarioDAO import BeneficiarioDAO
 from src.model.Beneficiario import Beneficiario
@@ -66,7 +66,6 @@ class PaginaInserirBeneficiario:
         self.CPFCNPJ_entry = tk.Entry(self.CPFCNPJ_frame, font=self.fonte, **self.conf_Entry)
         self.CPFCNPJ_entry.pack()
 
-
     def criar_botoes(self):
         Inserir_button = tk.Button(
             self.Botao_frame,
@@ -91,12 +90,23 @@ class PaginaInserirBeneficiario:
         nome = self.Nome_entry.get()
         email = self.Email_entry.get()
         cpfcnpj = self.CPFCNPJ_entry.get()
-        beneficiario= Beneficiario(None, nome, email, cpfcnpj)
+
+        if not nome or not email or not cpfcnpj:
+            messagebox.showerror("Erro", "Todos os campos devem ser preenchidos!")
+            return
+
+        beneficiario = Beneficiario(None, nome, email, cpfcnpj)
         dao = BeneficiarioDAO()
-        dao.inserir(beneficiario)
+
+        try:
+            dao.inserir(beneficiario)
+            messagebox.showinfo("Sucesso", "Beneficiário inserido com sucesso!")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao inserir beneficiário: {e}")
 
     def voltar(self):
         self.tela.destroy()
+
 
 # Executar a aplicação
 if __name__ == "__main__":
